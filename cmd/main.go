@@ -1,7 +1,7 @@
 package main
 
 import (
-    "gowiki/cmd/server"
+    "gowiki/internal/server"
 )
 
 func main() {
