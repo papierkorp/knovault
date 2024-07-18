@@ -1,0 +1,11 @@
+package templates
+
+import (
+  "gowiki/internal/templates/layout"
+)
+
+templ Home() {
+	@layout.Base("Home") {
+		<h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">HOME</h1>
+	}
+}
