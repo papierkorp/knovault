@@ -30,5 +30,14 @@ vi static/css/main.css
 npx tailwindcss -i ./static/css/main.css -o ./static/css/output.css --watch
 
 cd static && wget https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js # --minify
+
+
+go get github.com/gomarkdown/markdown
+go get github.com/labstack/echo/v4/middleware@v4.12.0
 ```
 
+# Usage
+
+```bash
+make dev
+```
