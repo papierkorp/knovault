@@ -8,6 +8,8 @@ import (
 func Start() {
 	e := echo.New()
 
+	e.Static("/", "static")
+
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

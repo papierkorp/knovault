@@ -1,25 +1,21 @@
 package parser
 
 import (
+    "github.com/gomarkdown/markdown"
+    "github.com/gomarkdown/markdown/parser"
+    "github.com/microcosm-cc/bluemonday"
     "io/ioutil"
     "os"
     "path/filepath"
-
-    "github.com/gomarkdown/markdown"
-    "github.com/gomarkdown/markdown/parser"
 )
 
 func ReadMarkdownFile(filename string) (string, error) {
-    // Get the current working directory
     cwd, err := os.Getwd()
     if err != nil {
         return "", err
     }
 
-    // Construct the path to the data directory
     dataDir := filepath.Join(cwd, "data")
-
-    // Construct the full path to the file
     path := filepath.Join(dataDir, filename)
 
     content, err := ioutil.ReadFile(path)
@@ -27,9 +23,10 @@ func ReadMarkdownFile(filename string) (string, error) {
         return "", err
     }
 
-    extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+    extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
     parser := parser.NewWithExtensions(extensions)
-    md := markdown.ToHTML(content, parser, nil)
+    maybeUnsafeHTML := markdown.ToHTML(content, parser, nil)
+    html := bluemonday.UGCPolicy().SanitizeBytes(maybeUnsafeHTML)
 
-    return string(md), nil
+    return string(html), nil
 }

@@ -12,7 +12,7 @@ templ-generate:
 
 .PHONY: dev
 dev:
-	make templ-generate && go build -o ./bin/$(APP_NAME) ./cmd/$(APP_NAME)/main.go && air
+	make templ-generate && make tailwind-build && go build -o ./bin/$(APP_NAME) ./cmd/$(APP_NAME)/main.go && air
 
 .PHONY: build
 build:
