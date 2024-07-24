@@ -1,0 +1,28 @@
+package templates
+
+import (
+  "gowiki/internal/templates/layout"
+  "gowiki/internal/filemanager"
+  "fmt"
+)
+
+templ Playground() {
+    @layout.Base("Playground") {
+        {{
+            all_files, err := filemanager.GetAllFiles()
+            fmt.Println("all_files: ", all_files)
+            if err != nil {
+                fmt.Println("Error fetching files:", err)
+                all_files = []string{} // Avoid nil slice issues if there's an error
+            }
+        }}
+        <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Playground</h1>
+        <ul>
+            for _, file := range all_files {
+                <li>{file}</li>
+            }
+        </ul>
+    }
+}
+
+

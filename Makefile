@@ -8,7 +8,8 @@ tailwind-build:
 
 .PHONY: templ-generate
 templ-generate:
-	templ generate
+	TEMPL_EXPERIMENT=rawgo templ generate
+	# templ generate
 
 .PHONY: dev
 dev:
