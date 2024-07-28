@@ -16,13 +16,13 @@ func GetAllFiles() ([]string, error) {
 		return output, err1
 	}
 	dataDir := filepath.Join(cwd, "data")
-	fmt.Println("dataDir: ", dataDir)
+
 	err := filepath.Walk(dataDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
-		fmt.Printf("dir: %v: name: %s\n", info.IsDir(), path)
+
 		if !info.IsDir() {
 			output = append(output, path)
 		}

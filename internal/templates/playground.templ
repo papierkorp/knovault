@@ -6,23 +6,68 @@ import (
   "fmt"
 )
 
+func getFileList() ([]string) {
+        all_files, err := filemanager.GetAllFiles()
+        fmt.Println("all_files: ", all_files)
+        if err != nil {
+            fmt.Println("Error fetching files:", err)
+            all_files = []string{}
+        }
+
+        return all_files
+}
+
+
 templ Playground() {
     @layout.Base("Playground") {
-        {{
-            all_files, err := filemanager.GetAllFiles()
-            fmt.Println("all_files: ", all_files)
-            if err != nil {
-                fmt.Println("Error fetching files:", err)
-                all_files = []string{} // Avoid nil slice issues if there's an error
-            }
-        }}
+        <h1>title</h1>
+
         <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Playground</h1>
-        <ul>
-            for _, file := range all_files {
-                <li>{file}</li>
-            }
-        </ul>
+        <div class="shrink-0">
+        for _, file := range getFileList() {
+            {{
+                content, err := filemanager.ParseMarkdownToHtml(file)
+                fmt.Println("err: ", err)
+            }}
+            <div class="markdown-content text-xl font-medium text-black">
+                { content }
+                <br/>
+                <h1>asdf</h1>
+            </div>
+        }
+        </div>
     }
 }
 
 
+templ headerComponent(title string) {
+  <head><title>{ title }</title></head>
+}
+
+templ contentComponent(title string, body templ.Component) {
+  <body>
+    <h1>{ title }</h1>
+    <div class="content">
+      @body
+    </div>
+  </body>
+}
+
+templ contentPage(title string, body templ.Component) {
+  <html>
+    @headerComponent(title)
+    @contentComponent(title, body)
+  </html>
+}
+
+templ indexPage(posts []Post) {
+  <html>
+    @headerComponent("My Blog")
+    <body>
+      <h1>My Blog</h1>
+      for _, post := range posts {
+        <div><a href={ templ.SafeURL(path.Join(post.Date.Format("2006/01/02"), slug.Make(post.Title), "/")) }>{ post.Title }</a></div>
+      }
+    </body>
+  </html>
+}
