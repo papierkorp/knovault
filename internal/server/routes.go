@@ -9,6 +9,6 @@ func setupRoutes(e *echo.Echo) {
 	e.GET("/help", handleHelp)
 	e.GET("/settings", handleSettings)
 	e.GET("/search", handleSearch)
-	e.GET("/docs/*", handleDocs)
+	e.GET("/docs/:title", handleDocs)
 	e.GET("/playground", handlePlayground)
 }

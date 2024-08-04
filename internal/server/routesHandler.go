@@ -7,11 +7,6 @@ import (
 	"log"
 )
 
-type Article struct {
-	path  String
-	title String
-}
-
 func handleHome(c echo.Context) error {
 	content, err := filemanager.ParseMarkdownToHtml("/mnt/c/develop/gowiki/data/example_markdown.md")
 
@@ -49,7 +44,8 @@ func handleSearch(c echo.Context) error {
 	return _render(c, component)
 }
 
-func handleDocs(c echo.Context, article Article) error {
-	component := templates.Docs(article)
+func handleDocs(c echo.Context) error {
+	title := c.Param("title")
+	component := templates.Docs(title)
 	return _render(c, component)
 }
