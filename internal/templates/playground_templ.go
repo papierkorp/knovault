@@ -16,7 +16,7 @@ import (
 
 func getFileList() []string {
 	all_files, err := filemanager.GetAllFiles()
-	fmt.Println("all_files: ", all_files)
+	fmt.Println("all_files:", all_files)
 	if err != nil {
 		fmt.Println("Error fetching files:", err)
 		all_files = []string{}
@@ -55,7 +55,7 @@ func Playground() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>title</h1><h1 class=\"mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white\">Playground</h1><div class=\"shrink-0\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white\">Playground</h1><div class=\"shrink-0\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -63,20 +63,20 @@ func Playground() templ.Component {
 
 				content, err := filemanager.ParseMarkdownToHtml(file)
 				fmt.Println("err: ", err)
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"markdown-content text-xl font-medium text-black\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"markdown-content text-xl font-medium text-black\"><h1>asdf</h1><br>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(content)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/playground.templ`, Line: 31, Col: 14}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/playground.templ`, Line: 31, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<br><h1>asdf</h1></div>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

@@ -22,7 +22,8 @@ func GetAllFiles() ([]string, error) {
 			fmt.Println(err)
 			return err
 		}
-
+		fmt.Println("os.FileInfo: ", info)
+		fmt.Println("FileName: ", info.Name())
 		if !info.IsDir() {
 			output = append(output, path)
 		}

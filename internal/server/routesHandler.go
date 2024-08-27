@@ -8,7 +8,7 @@ import (
 )
 
 func handleHome(c echo.Context) error {
-	content, err := filemanager.ParseMarkdownToHtml("/mnt/c/develop/gowiki/data/example_markdown.md")
+	content, err := filemanager.ParseMarkdownToHtml("/mnt/c/develop/privat/gowiki/data/example_markdown.md")
 
 	if err != nil {
 		log.Printf("Error reading markdown file: %v", err)

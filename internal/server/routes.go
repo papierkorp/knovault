@@ -6,6 +6,7 @@ import (
 
 func setupRoutes(e *echo.Echo) {
 	e.GET("/", handleHome)
+	e.GET("/home", handleHome)
 	e.GET("/help", handleHelp)
 	e.GET("/settings", handleSettings)
 	e.GET("/search", handleSearch)
