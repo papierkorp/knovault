@@ -5,9 +5,10 @@ import (
     "github.com/gomarkdown/markdown/parser"
     "github.com/microcosm-cc/bluemonday"
     "io/ioutil"
+    "path/filepath"
 )
 
-func ParseMarkdownToHtml(path string) (string, error) {
+func ParseMarkdownToHtml(relativePath string) (string) {
     // cwd, err := os.Getwd()
     // if err != nil {
     //     return "", err
@@ -16,9 +17,11 @@ func ParseMarkdownToHtml(path string) (string, error) {
     // dataDir := filepath.Join(cwd, "data")
     // path := filepath.Join(dataDir, filename)
 
+    path := filepath.Join("data", relativePath)
+
     content, err := ioutil.ReadFile(path)
     if err != nil {
-        return "", err
+        return ""
     }
 
     extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
@@ -26,5 +29,5 @@ func ParseMarkdownToHtml(path string) (string, error) {
     maybeUnsafeHTML := markdown.ToHTML(content, parser, nil)
     html := bluemonday.UGCPolicy().SanitizeBytes(maybeUnsafeHTML)
 
-    return string(html), nil
+    return string(html)
 }

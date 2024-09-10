@@ -4,16 +4,18 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
-func GetAllFiles() ([]string, error) {
+
+func GetAllFiles() ([]string) {
 	fmt.Println("RUNNING GetAllFiles()!!!!!!!!!!!!!!!!!!")
 
 	output := []string{}
 
 	cwd, err1 := os.Getwd()
 	if err1 != nil {
-		return output, err1
+		return output
 	}
 	dataDir := filepath.Join(cwd, "data")
 
@@ -25,8 +27,11 @@ func GetAllFiles() ([]string, error) {
 		fmt.Println("os.FileInfo: ", info)
 		fmt.Println("FileName: ", info.Name())
 		if !info.IsDir() {
-			output = append(output, path)
+			relativePath := strings.TrimPrefix(path, dataDir+"/")
+			output = append(output, relativePath)
 		}
+
+		fmt.Println("output: ", output)
 
 		return nil
 	})
@@ -34,5 +39,6 @@ func GetAllFiles() ([]string, error) {
 		fmt.Println(err)
 	}
 
-	return output, err
+	return output
 }
+

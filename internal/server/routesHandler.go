@@ -4,29 +4,20 @@ import (
 	"github.com/labstack/echo/v4"
 	"gowiki/internal/filemanager"
 	"gowiki/internal/templates"
-	"log"
 )
 
 func handleHome(c echo.Context) error {
-	content, err := filemanager.ParseMarkdownToHtml("/mnt/c/develop/privat/gowiki/data/example_markdown.md")
-
-	if err != nil {
-		log.Printf("Error reading markdown file: %v", err)
-		return err
-	}
-
-	err = templates.Home(content).Render(c.Request().Context(), c.Response().Writer)
-	if err != nil {
-		log.Printf("Error rendering template: %v", err)
-		return err
-	}
-
-	return nil
+		component := templates.Home()
+	return _render(c, component)
 }
 
 func handlePlayground(c echo.Context) error {
-	component := templates.Playground()
-	return _render(c, component)
+	content := filemanager.ParseMarkdownToHtml("example_markdown.md")
+
+	templates.Playground(content).Render(c.Request().Context(), c.Response().Writer)
+
+
+	return nil
 }
 
 func handleHelp(c echo.Context) error {
@@ -41,6 +32,11 @@ func handleSettings(c echo.Context) error {
 
 func handleSearch(c echo.Context) error {
 	component := templates.Search()
+	return _render(c, component)
+}
+
+func handleDocsRoot(c echo.Context) error {
+	component := templates.DocsRoot()
 	return _render(c, component)
 }
 
