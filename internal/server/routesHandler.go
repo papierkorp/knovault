@@ -1,21 +1,25 @@
 package server
 
 import (
-	"github.com/labstack/echo/v4"
 	"gowiki/internal/filemanager"
 	"gowiki/internal/templates"
+	"gowiki/internal/themes"
+	"github.com/labstack/echo/v4"
 )
 
+
 func handleHome(c echo.Context) error {
-		component := templates.Home()
-	return _render(c, component)
+	component, err := themes.GetCurrentTheme().Home()
+	if err != nil {
+		return err
+	}
+	return component.Render(c.Request().Context(), c.Response().Writer)
 }
 
 func handlePlayground(c echo.Context) error {
 	content := filemanager.ParseMarkdownToHtml("example_markdown.md")
 
 	templates.Playground(content).Render(c.Request().Context(), c.Response().Writer)
-
 
 	return nil
 }
