@@ -2,8 +2,8 @@ package server
 
 import (
 	"gowiki/internal/filemanager"
-	"gowiki/internal/templates"
 	"gowiki/internal/themes"
+	"net/http"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,39 +13,72 @@ func handleHome(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return component.Render(c.Request().Context(), c.Response().Writer)
+	return _render(c, component)
 }
 
 func handlePlayground(c echo.Context) error {
 	content := filemanager.ParseMarkdownToHtml("example_markdown.md")
 
-	templates.Playground(content).Render(c.Request().Context(), c.Response().Writer)
-
-	return nil
+    component, err := themes.GetCurrentTheme().Playground(content)
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
 func handleHelp(c echo.Context) error {
-	component := templates.Help()
+	component, err := themes.GetCurrentTheme().Help()
+	if err != nil {
+		return err
+	}
 	return _render(c, component)
 }
 
 func handleSettings(c echo.Context) error {
-	component := templates.Settings()
+	component, err := themes.GetCurrentTheme().Settings()
+	if err != nil {
+		return err
+	}
 	return _render(c, component)
 }
 
 func handleSearch(c echo.Context) error {
-	component := templates.Search()
+	component, err := themes.GetCurrentTheme().Search()
+	if err != nil {
+		return err
+	}
 	return _render(c, component)
 }
 
 func handleDocsRoot(c echo.Context) error {
-	component := templates.DocsRoot()
+	component, err := themes.GetCurrentTheme().DocsRoot()
+	if err != nil {
+		return err
+	}
 	return _render(c, component)
 }
 
 func handleDocs(c echo.Context) error {
 	title := c.Param("title")
-	component := templates.Docs(title)
+	component, err := themes.GetCurrentTheme().Docs(title)
+	if err != nil {
+		return err
+	}
 	return _render(c, component)
+}
+
+func handleChangeTheme(c echo.Context) error {
+	var request struct {
+		Theme string `json:"theme"`
+	}
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]bool{"success": false})
+	}
+
+	err := themes.SetCurrentTheme(request.Theme)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]bool{"success": false})
+	}
+
+	return c.JSON(http.StatusOK, map[string]bool{"success": true})
 }

@@ -2,8 +2,8 @@ package defaultTheme
 
 import (
 	"github.com/a-h/templ"
-	"gowiki/internal/templates"
-	"gowiki/internal/themes"
+    "gowiki/internal/themes"
+    "gowiki/internal/themes/defaultTheme/templates"
 )
 
 type defaultTheme struct{}

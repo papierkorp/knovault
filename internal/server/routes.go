@@ -13,4 +13,5 @@ func setupRoutes(e *echo.Echo) {
 	e.GET("/docs", handleDocsRoot)
 	e.GET("/docs/:title", handleDocs)
 	e.GET("/playground", handlePlayground)
+	e.POST("/change-theme", handleChangeTheme)
 }

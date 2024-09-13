@@ -4,7 +4,7 @@ import (
 	"github.com/a-h/templ"
 )
 
-type RoutesHandler interface {
+type Theme interface {
 	Home() (templ.Component, error)
 	Help() (templ.Component, error)
 	Settings() (templ.Component, error)

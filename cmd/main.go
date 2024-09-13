@@ -5,10 +5,11 @@ import (
 	"gowiki/internal/themes"
 	"log"
     _ "gowiki/internal/themes/defaultTheme" 
+    _ "gowiki/internal/themes/dark" 
 )
 
 func main() {
-    err := themes.SetCurrentTheme("defaultTheme")
+    err := themes.SetCurrentTheme("dark")
     if err != nil {
         log.Fatalf("Failed to set default theme: %v", err)
     }

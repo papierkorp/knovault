@@ -1,0 +1,114 @@
+package layout
+
+templ Base(title string) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>{ title }</title>
+			@head()
+		</head>
+		<body class="bg-slate-100 dark:bg-slate-800">
+			<div id="wrapper">
+				@header()
+				@htmx()
+				<hr />
+				<main>
+					{ children... }
+				</main>
+			</div>
+		</body>
+	</html>
+}
+
+templ head() {
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<link href="/css/output.css" rel="stylesheet"/>
+}
+
+templ header() {
+	<header>
+		<a href="/" class="text-blue-600">HOME</a>
+		@darkmodetoggle()
+		@themeSwitcher()
+	</header>
+}
+
+templ htmx() {
+	<script src="/static/htmx.min.js"></script>
+}
+
+
+
+templ darkmodetoggle() {
+	<button id="theme-toggle">Toggle Dark Mode</button>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+		  const toggleButton = document.getElementById('theme-toggle');
+		  const htmlElement = document.documentElement;
+
+		  // Check localStorage for theme preference
+		  const currentTheme = localStorage.getItem('theme');
+		  if (currentTheme === 'dark') {
+		    htmlElement.classList.add('dark');
+		  } else {
+		    htmlElement.classList.remove('dark');
+		  }
+
+		  // Toggle dark mode on button click
+		  toggleButton.addEventListener('click', () => {
+		    if (htmlElement.classList.contains('dark')) {
+		      htmlElement.classList.remove('dark');
+		      localStorage.setItem('theme', 'light'); // Save preference
+		    } else {
+		      htmlElement.classList.add('dark');
+		      localStorage.setItem('theme', 'dark'); // Save preference
+		    }
+		  });
+		});
+	</script>
+}
+
+
+templ themeSwitcher() {
+	<select id="theme-select" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded">
+		<option value="defaultTheme">Default Theme</option>
+		<option value="dark">Dark</option>
+		// Add more theme options here as needed
+	</select>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const themeSelect = document.getElementById('theme-select');
+			
+			// Load the current theme from localStorage
+			const currentTheme = localStorage.getItem('appTheme') || 'defaultTheme';
+			themeSelect.value = currentTheme;
+
+			themeSelect.addEventListener('change', (event) => {
+				const selectedTheme = event.target.value;
+				localStorage.setItem('appTheme', selectedTheme);
+
+				// Make an AJAX request to change the theme
+				fetch('/change-theme', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ theme: selectedTheme }),
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						// Reload the page to apply the new theme
+						window.location.reload();
+					} else {
+						console.error('Failed to change theme');
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			});
+		});
+	</script>
+}
