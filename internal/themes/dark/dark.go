@@ -1,9 +1,11 @@
 package dark
 
 import (
+	"fmt"
+	"gowiki/internal/themes"
+	"gowiki/internal/themes/dark/templates"
+
 	"github.com/a-h/templ"
-    "gowiki/internal/themes"
-    "gowiki/internal/themes/dark/templates"
 )
 
 type dark struct{}
@@ -37,5 +39,6 @@ func (t *dark) Help() (templ.Component, error) {
 }
 
 func init() {
+	fmt.Println("Registering dark theme")
 	themes.RegisterTheme("dark", &dark{})
 }

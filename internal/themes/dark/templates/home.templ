@@ -1,12 +1,8 @@
 package templates
 
-import (
-    "gowiki/internal/themes/defaultTheme/templates/layout"
-)
-
 
 templ Home() {
-	@layout.Base("Home") {
+	@Base("Home") {
 		<div>
 			<ul>
 				<li><a href="/">home</a></li>
