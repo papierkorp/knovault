@@ -2,40 +2,45 @@ package defaultTheme
 
 import (
 	"github.com/a-h/templ"
-    "gowiki/internal/themes"
-    "gowiki/internal/themes/defaultTheme/templates"
+	"pewitima/internal/themes"
+	"pewitima/internal/themes/defaultTheme/templates"
 )
 
-type defaultTheme struct{}
+type DefaultTheme struct{}
 
-func (t *defaultTheme) Docs(content string) (templ.Component, error) {
-	return templates.Docs(content), nil
-}
 
-func (t *defaultTheme) DocsRoot() (templ.Component, error) {
-	return templates.DocsRoot(), nil
-}
-
-func (t *defaultTheme) Playground(content string) (templ.Component, error) {
-	return templates.Playground(content), nil
-}
-
-func (t *defaultTheme) Search() (templ.Component, error) {
-	return templates.Search(), nil
-}
-
-func (t *defaultTheme) Settings() (templ.Component, error) {
-	return templates.Settings(), nil
-}
-
-func (t *defaultTheme) Home() (templ.Component, error) {
+func (t *DefaultTheme) Home() (templ.Component, error) {
 	return templates.Home(), nil
 }
 
-func (t *defaultTheme) Help() (templ.Component, error) {
+func (t *DefaultTheme) Help() (templ.Component, error) {
 	return templates.Help(), nil
 }
 
+func (t *DefaultTheme) Settings() (templ.Component, error) {
+	return templates.Settings(), nil
+}
+
+func (t *DefaultTheme) Search() (templ.Component, error) {
+	return templates.Search(), nil
+}
+
+func (t *DefaultTheme) DocsRoot() (templ.Component, error) {
+	return templates.DocsRoot(), nil
+}
+
+func (t *DefaultTheme) Docs(content string) (templ.Component, error) {
+	return templates.Docs(content), nil
+}
+
+func (t *DefaultTheme) Playground() (templ.Component, error) {
+	return templates.Playground(), nil
+}
+
+func (t *DefaultTheme) Plugins() (templ.Component, error) {
+    return templates.Plugins(), nil
+}
+
 func init() {
-	themes.RegisterTheme("defaultTheme", &defaultTheme{})
+	themes.RegisterTheme("defaultTheme", &DefaultTheme{})
 }

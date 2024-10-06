@@ -1,9 +1,11 @@
 package server
 
 import (
-	"gowiki/internal/filemanager"
-	"gowiki/internal/themes"
 	"net/http"
+	"pewitima/internal/plugins"
+	"pewitima/internal/themes"
+
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,10 +18,9 @@ func handleHome(c echo.Context) error {
 	return _render(c, component)
 }
 
-func handlePlayground(c echo.Context) error {
-	content := filemanager.ParseMarkdownToHtml("example_markdown.md")
 
-    component, err := themes.GetCurrentTheme().Playground(content)
+func handlePlayground(c echo.Context) error {
+    component, err := themes.GetCurrentTheme().Playground()
     if err != nil {
         return err
     }
@@ -67,18 +68,58 @@ func handleDocs(c echo.Context) error {
 	return _render(c, component)
 }
 
-func handleChangeTheme(c echo.Context) error {
-	var request struct {
-		Theme string `json:"theme"`
-	}
-	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]bool{"success": false})
-	}
 
-	err := themes.SetCurrentTheme(request.Theme)
+func handlePlugins(c echo.Context) error {
+	component, err := themes.GetCurrentTheme().Plugins()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]bool{"success": false})
+		return err
+	}
+	return _render(c, component)
+}
+
+func handlePluginExecute(c echo.Context) error {
+	pluginName := c.Param("pluginName")
+	plugin, ok := plugins.GetPlugin(pluginName)
+	if !ok {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Plugin not found"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]bool{"success": true})
+	// Collect all form values as parameters
+	params := make(map[string]string)
+	formParams, err := c.FormParams()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to parse form parameters"})
+	}
+	for key, values := range formParams {
+		if len(values) > 0 {
+			params[key] = values[0]
+		}
+	}
+
+	// Special handling for ThemeChanger plugin
+	if c.Request().Method == "POST" && pluginName == "ThemeChanger" {
+		newTheme, ok := params["theme"]
+		if ok {
+			if err := themes.SetCurrentTheme(newTheme); err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			}
+			c.Response().Header().Set("HX-Refresh", "true")
+		}
+	}
+
+	// Execute the plugin
+	response, err := plugin.Execute(params)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	// Handle different response types
+	switch response := response.(type) {
+	case []byte:
+		return c.Blob(http.StatusOK, "application/json", response)
+	case templ.Component:
+		return _render(c, response)
+	default:
+		return c.JSON(http.StatusOK, response)
+	}
 }

@@ -1,11 +1,11 @@
-# gowiki
+# pewitima
 
 # Installation process
 
 ```bash
 # go projekt vorbereiten
-mkdir gowiki && cd gowiki
-go mod init gowiki
+mkdir pewitima && cd pewitima
+go mod init pewitima
 go mod tidy
 
 go install github.com/air-verse/air@latest
@@ -112,7 +112,7 @@ template
 package templates
 
 import (
-    "gowiki/internal/templates/layout"
+    "pewitima/internal/templates/layout"
 )
 
 templ Home(content string) {

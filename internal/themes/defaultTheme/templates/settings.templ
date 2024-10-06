@@ -1,35 +1,38 @@
 package templates
 
 import (
-    "gowiki/internal/themes"
-    "gowiki/internal/plugins/core"
-    "gowiki/internal/themes/defaultTheme/templates/layout"
+    "pewitima/internal/themes/defaultTheme/templates/layout"
+    "pewitima/internal/plugins"
 )
 
 templ Settings() {
-	@layout.Base("Settings") {
-		<div>
-			<h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Settings</h1>
-			@renderPluginsDarkMode()
-			@renderPluginsThemeSwitcher()
-		</div>
-	}
-}
+    @layout.Base("Settings") {
+        <div>
+            <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Settings</h1>
+            <div class="mb-6">
+                <h2 class="mb-4 text-xl font-bold">Hello World Plugin Output:</h2>
+                if plugin, ok := plugins.GetPlugin("HelloWorld"); ok {
+                    if response, err := plugin.TemplResponse(); err == nil {
+                        @response
+                    } else {
+                        <p class="text-red-500">Error: { err.Error() }</p>
+                    }
+                } else {
+                    <p class="text-red-500">HelloWorld plugin not found</p>
+                }
 
-templ renderPluginsDarkMode() {
-    for _, plugin := range themes.GetPluginManager().AllPlugins() {
-        if darkModePlugin, ok := plugin.(*core.DarkModePlugin); ok {
-            @darkModePlugin.Render()
-        }
+                <h2 class="mb-4 text-xl font-bold mt-8">Theme Changer Plugin:</h2>
+                if plugin, ok := plugins.GetPlugin("ThemeChanger"); ok {
+                    if response, err := plugin.TemplResponse(); err == nil {
+                        @response
+                    } else {
+                        <p class="text-red-500">Error: { err.Error() }</p>
+                    }
+                } else {
+                    <p class="text-red-500">ThemeChanger plugin not found</p>
+                }
+            </div>
+
+        </div>
     }
 }
-
-templ renderPluginsThemeSwitcher() {
-    for _, plugin := range themes.GetPluginManager().AllPlugins() {
-        if themeSwitcherPlugin, ok := plugin.(*core.ThemeSwitcherPlugin); ok {
-            @themeSwitcherPlugin.Render()
-        }
-    }
-}
-
-

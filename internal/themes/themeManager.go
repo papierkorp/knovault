@@ -1,55 +1,64 @@
 package themes
 
 import (
-	"fmt"
-	"gowiki/internal/types"
-	"gowiki/internal/plugins"
+    "fmt"
+    "pewitima/internal/types"
+    "log"
+    "sync"
 )
 
-
 var (
-	currentTheme types.Theme
-	themes       = make(map[string]types.Theme)
-	pluginManager *plugins.Manager
+    themes       = make(map[string]types.Theme)
+    currentTheme types.Theme
+    themeMutex   sync.RWMutex
 )
 
 func RegisterTheme(name string, theme types.Theme) {
-	fmt.Printf("Registering theme: %s\n", name)
-	themes[name] = theme
-	fmt.Printf("Registered themes: %v\n", themes)
+    themeMutex.Lock()
+    defer themeMutex.Unlock()
+    themes[name] = theme
+    log.Printf("Theme registered: %s", name)
+    if currentTheme == nil {
+        currentTheme = theme
+        log.Printf("Set default theme: %s", name)
+    }
 }
 
 func SetCurrentTheme(name string) error {
-    fmt.Printf("Setting current theme to: %s\n", name)
+    themeMutex.Lock()
+    defer themeMutex.Unlock()
     theme, ok := themes[name]
     if !ok {
-        availableThemes := GetAvailableThemes()
-        fmt.Printf("Theme %s not found. Available themes: %v\n", name, availableThemes)
-        return fmt.Errorf("theme %s not found. Available themes: %v", name, availableThemes)
+        return fmt.Errorf("theme %s not found", name)
     }
     currentTheme = theme
-    fmt.Printf("Current theme set to: %s\n", name)
+    log.Printf("Current theme set to: %s", name)
     return nil
 }
 
 func GetCurrentTheme() types.Theme {
-    fmt.Printf("Getting current theme. Available themes: %v\n", themes)
-    fmt.Printf("Current theme: %T\n", currentTheme)
-	return currentTheme
+    themeMutex.RLock()
+    defer themeMutex.RUnlock()
+    return currentTheme
+}
+
+func GetCurrentThemeName() string {
+    themeMutex.RLock()
+    defer themeMutex.RUnlock()
+    for name, theme := range themes {
+        if theme == currentTheme {
+            return name
+        }
+    }
+    return ""
 }
 
 func GetAvailableThemes() []string {
-    var availableThemes []string
+    themeMutex.RLock()
+    defer themeMutex.RUnlock()
+    var themeNames []string
     for name := range themes {
-        availableThemes = append(availableThemes, name)
+        themeNames = append(themeNames, name)
     }
-    return availableThemes
-}
-
-func SetPluginManager(manager *plugins.Manager) {
-    pluginManager = manager
-}
-
-func GetPluginManager() *plugins.Manager {
-    return pluginManager
+    return themeNames
 }

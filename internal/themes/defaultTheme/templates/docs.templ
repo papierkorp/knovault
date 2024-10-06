@@ -1,8 +1,7 @@
 package templates
 
 import (
-	"gowiki/internal/themes/defaultTheme/templates/layout"
-    "gowiki/internal/filemanager"
+	"pewitima/internal/themes/defaultTheme/templates/layout"
 )
 
 templ Docs(title string) {
@@ -10,7 +9,7 @@ templ Docs(title string) {
 		<h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">{ title }</h1>
 
 		<div class="text-gray-500 dark:text-gray-400 p-4 my-4 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
-			@templ.Raw(filemanager.ParseMarkdownToHtml(title))
+			// @templ.Raw(filemanager.ParseMarkdownToHtml(title))
 		</div>
 		<div>
 			test

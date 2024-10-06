@@ -1,80 +1,125 @@
 package plugins
 
 import (
-    "fmt"
-    "sync"
-    "gowiki/internal/types"
-    "github.com/labstack/echo/v4"
+	"fmt"
+	"pewitima/internal/types"
+	"os"
+	"path/filepath"
+	"plugin"
+	"sync"
 )
 
-type Manager struct {
-    plugins map[string]types.Plugin
-    mu      sync.RWMutex
+var (
+	corePlugins     = make(map[string]types.Plugin)
+	commonPlugins   = make(map[string]types.Plugin)
+	pluginMutex     sync.RWMutex
+	pluginDirectory = "./internal/plugins"
+)
+
+func RegisterCorePlugin(name string, p types.Plugin) {
+	pluginMutex.Lock()
+	defer pluginMutex.Unlock()
+	corePlugins[name] = p
 }
 
-func NewManager() *Manager {
-    return &Manager{
-        plugins: make(map[string]types.Plugin),
-    }
+func LoadCommonPlugins() error {
+	commonPluginDir := filepath.Join(pluginDirectory, "common")
+	entries, err := os.ReadDir(commonPluginDir)
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".so" {
+			pluginPath := filepath.Join(commonPluginDir, entry.Name())
+			p, err := plugin.Open(pluginPath)
+			if err != nil {
+				return err
+			}
+
+			symPlugin, err := p.Lookup("Plugin")
+			if err != nil {
+				return err
+			}
+
+			var pl types.Plugin
+			pl, ok := symPlugin.(types.Plugin)
+			if !ok {
+				return fmt.Errorf("unexpected type from module symbol")
+			}
+
+			pluginMutex.Lock()
+			commonPlugins[pl.Name()] = pl
+			pluginMutex.Unlock()
+		}
+	}
+
+	return nil
 }
 
-func (m *Manager) RegisterPlugin(p types.Plugin) error {
-    m.mu.Lock()
-    defer m.mu.Unlock()
+func GetPlugin(name string) (types.Plugin, bool) {
+	pluginMutex.RLock()
+	defer pluginMutex.RUnlock()
 
-    if _, exists := m.plugins[p.Name()]; exists {
-        return fmt.Errorf("plugin %s already registered", p.Name())
-    }
-
-    m.plugins[p.Name()] = p
-    return p.Initialize()
+	if p, ok := corePlugins[name]; ok {
+		return p, true
+	}
+	if p, ok := commonPlugins[name]; ok {
+		return p, true
+	}
+	return nil, false
 }
 
-func (m *Manager) GetPlugin(name string) (types.Plugin, bool) {
-    m.mu.RLock()
-    defer m.mu.RUnlock()
+func ListPlugins() []types.PluginInfo {
+	pluginMutex.RLock()
+	defer pluginMutex.RUnlock()
 
-    p, ok := m.plugins[name]
-    return p, ok
+	var plugins []types.PluginInfo
+
+	for name, p := range corePlugins {
+		plugins = append(plugins, types.PluginInfo{
+			Name:        name,
+			Description: p.Description(),
+			Type:        "core",
+		})
+	}
+
+	for name, p := range commonPlugins {
+		plugins = append(plugins, types.PluginInfo{
+			Name:        name,
+			Description: p.Description(),
+			Type:        "common",
+		})
+	}
+
+	return plugins
 }
 
-func (m *Manager) AllPlugins() []types.Plugin {
-    m.mu.RLock()
-    defer m.mu.RUnlock()
-
-    plugins := make([]types.Plugin, 0, len(m.plugins))
-    for _, p := range m.plugins {
-        plugins = append(plugins, p)
-    }
-    return plugins
+func InstallCommonPlugin(name string) error {
+	// Implementation for installing a common plugin
+	// This could involve downloading the plugin, verifying it, and then loading it
+	return nil
 }
 
-func (m *Manager) ShutdownAll() error {
-    m.mu.Lock()
-    defer m.mu.Unlock()
+func UninstallCommonPlugin(name string) error {
+	pluginMutex.Lock()
+	defer pluginMutex.Unlock()
 
-    for _, p := range m.plugins {
-        if err := p.Shutdown(); err != nil {
-            return fmt.Errorf("error shutting down plugin %s: %w", p.Name(), err)
-        }
-    }
-    return nil
+	if _, exists := commonPlugins[name]; !exists {
+		return fmt.Errorf("plugin %s not found", name)
+	}
+
+	delete(commonPlugins, name)
+	// Additional cleanup if necessary
+
+	return nil
 }
 
-func (m *Manager) RegisterHandlers(e *echo.Echo) {
-    for _, p := range m.AllPlugins() {
-        for route, handler := range p.Handlers() {
-            e.GET(route, handler)
-        }
-    }
-}
+func ExecutePlugin(name string, params map[string]string) (interface{}, error) {
+	plugin, ok := GetPlugin(name)
+	if !ok {
+		return nil, fmt.Errorf("plugin %s not found", name)
+	}
 
-func (m *Manager) GetTemplateData() map[string]interface{} {
-    data := make(map[string]interface{})
-    for _, p := range m.AllPlugins() {
-        for k, v := range p.TemplateData() {
-            data[k] = v
-        }
-    }
-    return data
+	return plugin.Execute(params)
 }

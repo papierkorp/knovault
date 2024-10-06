@@ -1,28 +1,36 @@
 package server
 
 import (
-	"gowiki/internal/plugins"
-	"gowiki/internal/plugins/core"
-	"gowiki/internal/themes"
+	"pewitima/internal/themes"
+	_ "pewitima/internal/themes/defaultTheme"
+	_ "pewitima/internal/themes/secondTheme"
+	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"pewitima/internal/plugins"
+	_ "pewitima/internal/plugins/core"
 )
 
 func Start() {
-	e := echo.New()
+    e := echo.New()
 
-	pluginManager := plugins.NewManager()
-    themes.SetPluginManager(pluginManager)
-    pluginManager.RegisterPlugin(&core.ThemeSwitcherPlugin{})
-    pluginManager.RegisterPlugin(&core.DarkModePlugin{})
+    err := themes.SetCurrentTheme("defaultTheme")
+    if err != nil {
+        log.Fatalf("Failed to set default theme: %v", err)
+    }
 
-	e.Static("/", "static")
+    if err := plugins.LoadCommonPlugins(); err != nil {
+        log.Printf("Error loading common plugins: %v", err)
+    }
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
 
-	setupRoutes(e)
+    e.Static("/static", "static")
 
-	e.Logger.Fatal(e.Start(":1323"))
+    e.Use(middleware.Logger())
+    e.Use(middleware.Recover())
+
+    setupRoutes(e)
+
+    e.Logger.Fatal(e.Start(":1323"))
 }
