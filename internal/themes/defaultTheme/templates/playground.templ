@@ -32,18 +32,40 @@ templ Playground() {
                 <p class="text-red-500">ThemeChanger plugin not found</p>
             }
 
-
-
-            <h2 class="mb-4 text-xl font-bold mt-8">Theme Changer Plugin:</h2>
-            if plugin, ok := plugins.GetPlugin("ThemeChanger"); ok {
-                if response, err := plugin.TemplResponse(); err == nil {
-                    @response
+            <h2 class="mb-4 text-xl font-bold mt-8">File Manager Plugin:</h2>
+            if plugin, ok := plugins.GetPlugin("FileManager"); ok {
+                if response, err := plugin.Execute(nil); err == nil {
+                    if files, ok := response.([]string); ok {
+                        <ul>
+                            for _, file := range files {
+                                <li><a href={ templ.URL("/docs/" + file) }>{file}</a></li>
+                            }
+                        </ul>
+                    } else {
+                        <p class="text-red-500">Unexpected response type from FileManager plugin</p>
+                    }
                 } else {
                     <p class="text-red-500">Error: { err.Error() }</p>
                 }
             } else {
-                <p class="text-red-500">ThemeChanger plugin not found</p>
+                <p class="text-red-500">FileManager plugin not found</p>
             }
+
+            <h2 class="mb-4 text-xl font-bold mt-8">Markdown Parser Plugin:</h2>
+            if plugin, ok := plugins.GetPlugin("Parser"); ok {
+                if response, err := plugin.Execute(map[string]string{"filePath": "example_markdown.md"}); err == nil {
+                    if templComponent, ok := response.(templ.Component); ok {
+                        @templComponent
+                    } else {
+                        <p class="text-red-500">Unexpected response type from Parser plugin</p>
+                    }
+                } else {
+                    <p class="text-red-500">Error: { err.Error() }</p>
+                }
+            } else {
+                <p class="text-red-500">Parser plugin not found</p>
+            }
+
         </div>
     }
 }
