@@ -1,5 +1,7 @@
 # pewito
 
+Personal Wiki and To-dos
+
 # Installation process
 
 ```bash
