@@ -2,7 +2,7 @@ package plugins
 
 import (
 	"fmt"
-	"pewitima/internal/types"
+	"pewito/internal/types"
 	"os"
 	"path/filepath"
 	"plugin"

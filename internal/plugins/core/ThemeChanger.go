@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 	"context"
-	"pewitima/internal/plugins"
-	"pewitima/internal/themes"
+	"pewito/internal/plugins"
+	"pewito/internal/themes"
 
 	"github.com/a-h/templ"
 )

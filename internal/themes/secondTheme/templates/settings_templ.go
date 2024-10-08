@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"pewitima/internal/plugins"
+	"pewito/internal/plugins"
 )
 
 func Settings() templ.Component {

@@ -1,4 +1,4 @@
-module pewitima
+module pewito
 
 go 1.22
 

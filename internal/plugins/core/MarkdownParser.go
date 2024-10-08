@@ -5,7 +5,7 @@ import (
     "fmt"
     "io/ioutil"
     "path/filepath"
-    "pewitima/internal/plugins"
+    "pewito/internal/plugins"
 
     "github.com/a-h/templ"
     "github.com/gomarkdown/markdown"

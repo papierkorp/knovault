@@ -6,7 +6,7 @@ import (
     "io"
     "os"
     "path/filepath"
-    "pewitima/internal/plugins"
+    "pewito/internal/plugins"
     "strings"
 
     "github.com/a-h/templ"

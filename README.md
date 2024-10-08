@@ -1,11 +1,11 @@
-# pewitima
+# pewito
 
 # Installation process
 
 ```bash
 # go projekt vorbereiten
-mkdir pewitima && cd pewitima
-go mod init pewitima
+mkdir pewito && cd pewito
+go mod init pewito
 go mod tidy
 
 go install github.com/air-verse/air@latest
@@ -114,7 +114,7 @@ template
 package templates
 
 import (
-    "pewitima/internal/templates/layout"
+    "pewito/internal/templates/layout"
 )
 
 templ Home(content string) {
@@ -144,7 +144,7 @@ package core
 
 import (
     "encoding/json"
-    "pewitima/internal/plugins"
+    "pewito/internal/plugins"
     "github.com/a-h/templ"
 )
 
@@ -207,8 +207,8 @@ package myNewTheme
 
 import (
     "github.com/a-h/templ"
-    "pewitima/internal/themes"
-    "pewitima/internal/themes/myNewTheme/templates"
+    "pewito/internal/themes"
+    "pewito/internal/themes/myNewTheme/templates"
 )
 
 type MyNewTheme struct{}
@@ -265,7 +265,7 @@ func init() {
 ```go
 import (
     // ... other imports ...
-    _ "pewitima/internal/themes/myNewTheme"
+    _ "pewito/internal/themes/myNewTheme"
 )
 ```
 

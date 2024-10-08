@@ -2,8 +2,8 @@ package server
 
 import (
 	"net/http"
-	"pewitima/internal/plugins"
-	"pewitima/internal/themes"
+	"pewito/internal/plugins"
+	"pewito/internal/themes"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"

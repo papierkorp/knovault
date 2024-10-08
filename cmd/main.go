@@ -1,7 +1,7 @@
 package main
 
 import (
-    "pewitima/internal/server"
+    "pewito/internal/server"
 )
 
 func main() {

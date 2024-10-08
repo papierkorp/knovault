@@ -2,7 +2,7 @@ package core
 
 import (
 	"encoding/json"
-	"pewitima/internal/plugins"
+	"pewito/internal/plugins"
 	"time"
 
 	"github.com/a-h/templ"

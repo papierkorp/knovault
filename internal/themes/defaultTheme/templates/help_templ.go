@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"pewitima/internal/themes/defaultTheme/templates/layout"
+	"pewito/internal/themes/defaultTheme/templates/layout"
 )
 
 func Help() templ.Component {

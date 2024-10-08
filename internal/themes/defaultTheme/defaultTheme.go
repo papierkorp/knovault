@@ -2,8 +2,8 @@ package defaultTheme
 
 import (
 	"github.com/a-h/templ"
-	"pewitima/internal/themes"
-	"pewitima/internal/themes/defaultTheme/templates"
+	"pewito/internal/themes"
+	"pewito/internal/themes/defaultTheme/templates"
 )
 
 type DefaultTheme struct{}

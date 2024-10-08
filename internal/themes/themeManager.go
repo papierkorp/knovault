@@ -2,7 +2,7 @@ package themes
 
 import (
     "fmt"
-    "pewitima/internal/types"
+    "pewito/internal/types"
     "log"
     "sync"
 )

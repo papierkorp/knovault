@@ -1,15 +1,15 @@
 package server
 
 import (
-	"pewitima/internal/themes"
-	_ "pewitima/internal/themes/defaultTheme"
-	_ "pewitima/internal/themes/secondTheme"
+	"pewito/internal/themes"
+	_ "pewito/internal/themes/defaultTheme"
+	_ "pewito/internal/themes/secondTheme"
 	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"pewitima/internal/plugins"
-	_ "pewitima/internal/plugins/core"
+	"pewito/internal/plugins"
+	_ "pewito/internal/plugins/core"
 )
 
 func Start() {

@@ -2,8 +2,8 @@ package secondTheme
 
 import (
 	"github.com/a-h/templ"
-	"pewitima/internal/themes"
-	"pewitima/internal/themes/secondTheme/templates"
+	"pewito/internal/themes"
+	"pewito/internal/themes/secondTheme/templates"
 )
 
 type SecondTheme struct{}
