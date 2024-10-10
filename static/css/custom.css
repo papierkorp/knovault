@@ -1,4 +1,16 @@
-/* Custom CSS - Override Tailwind styles without !important */
+/* Add your custom CSS styles here. These styles will override the default styles. */
+/* In some cases you need to hard reload your page to see your changes (SHIFT + F5) */
 
-/* Add your custom styles below */
+/*
+.bg-slate-100 {
+	background-color: yellow;
+}
 
+#customcsstextarea {
+	background-color: yellow;
+}
+
+#search-input {
+	background-color: blue;
+}
+*/

@@ -30,6 +30,11 @@ type PluginWithRoute interface {
     Route() PluginRoute
 }
 
+type PluginWithTemplateExtensions interface {
+    Plugin
+    ExtendTemplate(templateName string) (templ.Component, error)
+}
+
 type PluginInfo struct {
     Name        string
     Description string

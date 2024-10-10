@@ -137,6 +137,30 @@ func ApplyPluginRoutes(e *echo.Echo) {
 	}
 }
 
+func GetPluginTemplateExtensions(templateName string) []templ.Component {
+	var extensions []templ.Component
+	
+	// Iterate over core plugins
+	for _, plugin := range corePlugins {
+		if extendablePlugin, ok := plugin.(types.PluginWithTemplateExtensions); ok {
+			if extension, err := extendablePlugin.ExtendTemplate(templateName); err == nil {
+				extensions = append(extensions, extension)
+			}
+		}
+	}
+	
+	// Iterate over common plugins
+	for _, plugin := range commonPlugins {
+		if extendablePlugin, ok := plugin.(types.PluginWithTemplateExtensions); ok {
+			if extension, err := extendablePlugin.ExtendTemplate(templateName); err == nil {
+				extensions = append(extensions, extension)
+			}
+		}
+	}
+	
+	return extensions
+}
+
 func handlePluginExecute(c echo.Context) error {
 	pluginName := c.Param("pluginName")
 	plugin, ok := GetPlugin(pluginName)

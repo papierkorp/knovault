@@ -1,8 +1,10 @@
 package core
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -100,10 +102,14 @@ func (p *CustomCSSPlugin) Route() types.PluginRoute {
                 return fmt.Errorf("unexpected result type")
             }
 
+            // Set headers to trigger a full page reload
+            c.Response().Header().Set("HX-Refresh", "true")
+
             return component.Render(c.Request().Context(), c.Response())
         },
     }
 }
+
 
 func (p *CustomCSSPlugin) readCustomCSS() (string, error) {
     data, err := os.ReadFile(p.CSSFilePath)
@@ -125,7 +131,35 @@ func (p *CustomCSSPlugin) writeCustomCSS(css string) error {
 }
 
 func getDefaultCSS() string {
-    return `/* Add your custom CSS styles here. These styles will override the default styles. */`
+    return `/* Add your custom CSS styles here. These styles will override the default styles. */
+/* In some cases you need to hard reload your page to see your changes (SHIFT + F5) */
+
+/*
+.bg-slate-100 {
+	background-color: yellow;
+}
+
+#customcsstextarea {
+	background-color: yellow;
+}
+
+#search-input {
+	background-color: blue;
+}
+*/
+`
+}
+
+func (p *CustomCSSPlugin) ExtendTemplate(templateName string) (templ.Component, error) {
+	switch templateName {
+	case "settings":
+		return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+			css, _ := p.readCustomCSS()
+			return pluginTemplates.CustomCSSEditor(css, "").Render(ctx, w)
+		}), nil
+	default:
+		return nil, fmt.Errorf("template %s not supported by CustomCSS plugin", templateName)
+	}
 }
 
 func init() {

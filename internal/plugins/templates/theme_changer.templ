@@ -1,0 +1,21 @@
+package templates
+
+import (
+	"strings"
+)
+
+templ ThemeChangerForm(availableThemes []string, currentTheme string) {
+	<div class="mt-6">
+		<h2 class="text-xl font-bold">Theme Settings</h2>
+		<form hx-post="/plugins/ThemeChanger" hx-swap="outerHTML">
+			<select name="theme" class="border rounded p-1 mr-2">
+				for _, theme := range availableThemes {
+					<option value={theme} selected?={theme == currentTheme}>
+						{strings.Title(theme)}
+					</option>
+				}
+			</select>
+			<button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Change Theme</button>
+		</form>
+	</div>
+}

@@ -1,13 +1,12 @@
 package core
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"pewito/internal/plugins"
 	"pewito/internal/themes"
 	"pewito/internal/types"
+	pluginTemplates "pewito/internal/plugins/templates"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
@@ -29,21 +28,7 @@ func (p *ThemeChangerPlugin) Help() string {
 func (p *ThemeChangerPlugin) TemplResponse() (templ.Component, error) {
 	availableThemes := themes.GetAvailableThemes()
 	currentTheme := themes.GetCurrentThemeName()
-
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
-		_, err = fmt.Fprintf(w, `
-			<div>
-				Select Theme:
-				<form hx-post="/plugins/ThemeChanger" hx-swap="outerHTML">
-					<select name="theme" class="border rounded p-1 mr-2">
-						%s
-					</select>
-					<button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Save</button>
-				</form>
-			</div>
-		`, p.generateThemeOptions(availableThemes, currentTheme))
-		return
-	}), nil
+	return pluginTemplates.ThemeChangerForm(availableThemes, currentTheme), nil
 }
 
 func (p *ThemeChangerPlugin) JsonResponse() ([]byte, error) {
@@ -93,6 +78,17 @@ func (p *ThemeChangerPlugin) Route() types.PluginRoute {
 			c.Response().Header().Set("HX-Refresh", "true")
 			return c.NoContent(200)
 		},
+	}
+}
+
+func (p *ThemeChangerPlugin) ExtendTemplate(templateName string) (templ.Component, error) {
+	switch templateName {
+	case "settings":
+		availableThemes := themes.GetAvailableThemes()
+		currentTheme := themes.GetCurrentThemeName()
+		return pluginTemplates.ThemeChangerForm(availableThemes, currentTheme), nil
+	default:
+		return nil, fmt.Errorf("template %s not supported by ThemeChanger plugin", templateName)
 	}
 }
 

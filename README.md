@@ -1,6 +1,6 @@
-# pewito
+# Pewito: Personal Wiki and To-dos
 
-Personal Wiki and To-dos
+Pewito is a personal wiki and to-do application built with Go, HTMX, Tailwind CSS, and Templ. It uses a `data` folder for storing markdown files and settings, which can be version-controlled with Git.
 
 # Installation process
 
@@ -36,110 +36,114 @@ cd static && wget https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js # --minify
 
 ```
 
-# Usage
+# Setup
+
+## Setting Up the Development Environment
+
+Follow these steps to set up your development environment:
+
+1. Install Go (1.16 or later): https://golang.org/doc/install
+
+2. Install Node.js and npm: https://nodejs.org/
+
+3. Clone the repository:
+4. `git clone https://github.com/your-username/pewito.git`
+
+5. Install Go dependencies: `go mod tidy`
+
+6. Install Templ: `go install github.com/a-h/templ/cmd/templ@latest`
+
+7. Install Tailwind CSS: `npm install`
+
+8. Install Air for live reloading (optional): `go install github.com/cosmtrek/air@latest`
+
+## Running the Application
+
+The project includes a Makefile to simplify common development tasks. Here are the main commands you'll use:
+
+1. Generate Templ files and build Tailwind CSS: `make build`
+
+2. Run the application in development mode (with live reloading): `make dev`
+
+3. Build Tailwind CSS only: `make tailwind-build`
+
+4. Watch for Tailwind CSS changes: `make tailwind-watch`
+
+5. Generate Templ files only: `make templ-generate`
+
+To start developing, run:
 
 ```bash
 make dev
 ```
 
-# markdown to html
+This command will generate Templ files, build Tailwind CSS, and start the application with live reloading.
 
-```bash
+Open your browser and navigate to [http://localhost:132](http://localhost:1323) to see the application.
 
-go get github.com/gomarkdown/markdown
-```
+## Creating a New Theme
 
-routes
+To create a new theme:
 
-```go
-func handleHome(c echo.Context) error {
-    content, err := parser.ReadMarkdownFile("example_markdown.md")
-    if err != nil {
-        log.Printf("Error reading markdown file: %v", err)
-        return err
-    }
+1. Create a new directory under `internal/themes` for your theme (e.g., `internal/themes/myNewTheme`).
 
-    err = templates.Home(content).Render(c.Request().Context(), c.Response().Writer)
-    if err != nil {
-        log.Printf("Error rendering template: %v", err)
-        return err
-    }
-
-    return nil
-}
-```
-
-parser
+2. Create a Go file for your theme (e.g., `myNewTheme.go`) with the following structure:
 
 ```go
-package parser
+package myNewTheme
 
 import (
-    "io/ioutil"
-    "os"
-    "path/filepath"
-
-    "github.com/gomarkdown/markdown"
-    "github.com/gomarkdown/markdown/parser"
+    "github.com/a-h/templ"
+    "pewito/internal/themes"
+    "pewito/internal/themes/myNewTheme/templates"
 )
 
-func ReadMarkdownFile(filename string) (string, error) {
-    // Get the current working directory
-    cwd, err := os.Getwd()
-    fmt.println("cwd: ", cwd, "err: ", err)
-    if err != nil {
-        return "", err
-    }
+type MyNewTheme struct{}
 
-    // Construct the path to the data directory
-    dataDir := filepath.Join(cwd, "data")
+func (t *MyNewTheme) Home() (templ.Component, error) {
+    return templates.Home(), nil
+}
 
-    // Construct the full path to the file
-    path := filepath.Join(dataDir, filename)
+// Implement other methods (Help, Settings, Search, DocsRoot, Docs, Playground, Plugins)
 
-    content, err := ioutil.ReadFile(path)
-    if err != nil {
-        return "", err
-    }
-
-    extensions := parser.CommonExtensions | parser.AutoHeadingIDs
-    parser := parser.NewWithExtensions(extensions)
-    md := markdown.ToHTML(content, parser, nil)
-
-    return string(md), nil
+func init() {
+    themes.RegisterTheme("myNewTheme", &MyNewTheme{})
 }
 ```
 
-template
+3. Create a `templates` directory inside your theme directory and add Templ files for each component (e.g., `home.templ`, `help.templ`, etc.).
+
+4. Implement the theme's design in these Templ files using Tailwind CSS classes.
+
+5. Update `server.go` to import your new theme:
 
 ```go
-package templates
-
 import (
-    "pewito/internal/templates/layout"
+    // ... other imports ...
+    _ "pewito/internal/themes/myNewTheme"
 )
+```
 
-templ Home(content string) {
-    @layout.Base("Home") {
-        <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">HOME</h1>
-        <div class="markdown-content">
-            @templ.Raw(content)
-        </div>
-    }
+6. To use the new theme, set it as the current theme in `server.go`:
+
+```go
+err := themes.SetCurrentTheme("myNewTheme")
+if err != nil {
+ log.Fatalf("Failed to set new theme: %v", err)
 }
 ```
 
-# Creating Core Plugins and Themes
+7. After creating or modifying Templ files, run: `make templ-generate`
 
-This guide explains how to create new core plugins and themes for the project.
+8. If you've made changes to Tailwind classes, rebuild the CSS: `make tailwind-build`
 
-## Creating a New Core Plugin
+## Creating a New Plugin
 
-To create a new core plugin, follow these steps:
+To create a new plugin:
 
-1. Create a new Go file in the `internal/plugins/core` directory with a descriptive name for your plugin (e.g., `MyNewPlugin.go`).
+1. Create a new Go file in the `internal/plugins/core` directory (e.g., `MyNewPlugin.go`).
 
-2. In this file, define a struct for your plugin and implement the `Plugin` interface. Here's a template:
+2. Implement the `Plugin` interface:
 
 ```go
 package core
@@ -179,7 +183,6 @@ func (p *MyNewPlugin) JsonResponse() ([]byte, error) {
 
 func (p *MyNewPlugin) Execute(params map[string]string) (interface{}, error) {
     // Implement the main functionality of your plugin here
-    // You can return a templ.Component, JSON, or any other type
     return "Plugin execution result", nil
 }
 
@@ -188,98 +191,41 @@ func init() {
 }
 ```
 
-3. Implement the methods of the `Plugin` interface according to your plugin's functionality.
-
-4. In the `init()` function, register your plugin using `plugins.RegisterCorePlugin()`.
-
-5. If your plugin requires any additional dependencies or setup, make sure to include them in the file.
-
-6. Update any relevant UI components (e.g., `playground.templ`) to include your new plugin if necessary.
-
-## Creating a New Theme
-
-To create a new theme, follow these steps:
-
-1. Create a new directory under `internal/themes` for your theme (e.g., `internal/themes/myNewTheme`).
-
-2. Inside this directory, create a Go file named after your theme (e.g., `myNewTheme.go`). Use this template:
+3. If your plugin requires a custom route, implement the `PluginWithRoute` interface:
 
 ```go
-package myNewTheme
-
-import (
-    "github.com/a-h/templ"
-    "pewito/internal/themes"
-    "pewito/internal/themes/myNewTheme/templates"
-)
-
-type MyNewTheme struct{}
-
-func (t *MyNewTheme) Home() (templ.Component, error) {
-    return templates.Home(), nil
-}
-
-func (t *MyNewTheme) Help() (templ.Component, error) {
-    return templates.Help(), nil
-}
-
-func (t *MyNewTheme) Settings() (templ.Component, error) {
-    return templates.Settings(), nil
-}
-
-func (t *MyNewTheme) Search() (templ.Component, error) {
-    return templates.Search(), nil
-}
-
-func (t *MyNewTheme) DocsRoot() (templ.Component, error) {
-    return templates.DocsRoot(), nil
-}
-
-func (t *MyNewTheme) Docs(content string) (templ.Component, error) {
-    return templates.Docs(content), nil
-}
-
-func (t *MyNewTheme) Playground() (templ.Component, error) {
-    return templates.Playground(), nil
-}
-
-func (t *MyNewTheme) Plugins() (templ.Component, error) {
-    return templates.Plugins(), nil
-}
-
-func init() {
-    themes.RegisterTheme("myNewTheme", &MyNewTheme{})
+func (p *MyNewPlugin) Route() types.PluginRoute {
+    return types.PluginRoute{
+        Method: "POST",
+        Path:   "/plugins/MyNewPlugin",
+        Handler: func(c echo.Context) error {
+            // Implement your route handler here
+        },
+    }
 }
 ```
 
-3. Create a `templates` subdirectory in your theme directory.
-
-4. In the `templates` directory, create templ files for each component (e.g., `home.templ`, `help.templ`, etc.). Implement your theme's design in these files.
-
-5. Create a `layout` subdirectory inside `templates` and add a `base.templ` file for the base layout of your theme.
-
-6. Implement each method in your theme struct to return the appropriate templ component.
-
-7. In the `init()` function, register your theme using `themes.RegisterTheme()`.
-
-8. Update the `server.go` file to import your new theme:
+4. If your plugin extends templates, implement the `PluginWithTemplateExtensions` interface:
 
 ```go
-import (
-    // ... other imports ...
-    _ "pewito/internal/themes/myNewTheme"
-)
-```
-
-9. To use your new theme, you can set it as the current theme in `server.go` or use the ThemeChanger plugin:
-
-```go
-err := themes.SetCurrentTheme("myNewTheme")
-if err != nil {
-    log.Fatalf("Failed to set new theme: %v", err)
+func (p *MyNewPlugin) ExtendTemplate(templateName string) (templ.Component, error) {
+    switch templateName {
+    case "settings":
+        return templ.Raw("<div>My plugin extension</div>"), nil
+    default:
+        return nil, fmt.Errorf("template %s not supported by MyNewPlugin", templateName)
+    }
 }
 ```
 
-Remember to style your theme components using Tailwind CSS classes to maintain consistency with the project's styling approach.
+5. Update any relevant UI components (e.g., `playground.templ` or `settings.templ`) to include your new plugin if necessary.
 
-By following these steps, you can extend the functionality of the project with new plugins and create custom themes to change the appearance of the application.
+6. After creating or modifying a plugin, rebuild the application: `make build`
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
