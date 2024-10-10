@@ -3,8 +3,11 @@ module.exports = {
   content: [
     './internal/themes/**/*.templ',
     './internal/themes/**/*_templ.go',
-    './internal/templates/**/*.templ',
-    './internal/templates/**/*_templ.go',
+    './internal/themes/defaultTheme/**/*.templ',
+    './internal/themes/defaultTheme/**/*_templ.go',
+    './internal/plugins/templates/**/*.templ',
+    './internal/plugins/templates/**/*_templ.go',
+    './internal/plugins/core/**/*.go',
   ],
   theme: {
     extend: {},

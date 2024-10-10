@@ -21,6 +21,17 @@ templ Playground() {
                 <p class="text-red-500">HelloWorld plugin not found</p>
             }
 
+            <h2 class="mb-4 text-xl font-bold mt-8">Custom CSS:</h2>
+            if plugin, ok := plugins.GetPlugin("CustomCSS"); ok {
+                if response, err := plugin.TemplResponse(); err == nil {
+                    @response
+                } else {
+                    <p class="text-red-500">Error: { err.Error() }</p>
+                }
+            } else {
+                <p class="text-red-500">CustomCSS plugin not found</p>
+            }
+
             <h2 class="mb-4 text-xl font-bold mt-8">Theme Changer Plugin:</h2>
             if plugin, ok := plugins.GetPlugin("ThemeChanger"); ok {
                 if response, err := plugin.TemplResponse(); err == nil {

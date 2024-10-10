@@ -2,11 +2,16 @@ package plugins
 
 import (
 	"fmt"
-	"pewito/internal/types"
+	"net/http"
 	"os"
 	"path/filepath"
+	"pewito/internal/types"
+	_ "pewito/internal/plugins/templates"
 	"plugin"
 	"sync"
+
+	"github.com/a-h/templ"
+	"github.com/labstack/echo/v4"
 )
 
 var (
@@ -15,6 +20,7 @@ var (
 	pluginMutex     sync.RWMutex
 	pluginDirectory = "./internal/plugins"
 )
+
 
 func RegisterCorePlugin(name string, p types.Plugin) {
 	pluginMutex.Lock()
@@ -113,6 +119,58 @@ func UninstallCommonPlugin(name string) error {
 	// Additional cleanup if necessary
 
 	return nil
+}
+
+func ApplyPluginRoutes(e *echo.Echo) {
+	for _, p := range corePlugins {
+		if routePlugin, ok := p.(types.PluginWithRoute); ok {
+			route := routePlugin.Route()
+			e.Add(route.Method, route.Path, route.Handler)
+		}
+	}
+
+	for _, p := range commonPlugins {
+		if routePlugin, ok := p.(types.PluginWithRoute); ok {
+			route := routePlugin.Route()
+			e.Add(route.Method, route.Path, route.Handler)
+		}
+	}
+}
+
+func handlePluginExecute(c echo.Context) error {
+	pluginName := c.Param("pluginName")
+	plugin, ok := GetPlugin(pluginName)
+	if !ok {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Plugin not found"})
+	}
+
+	// Collect all form values as parameters
+	params := make(map[string]string)
+	formParams, err := c.FormParams()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to parse form parameters"})
+	}
+	for key, values := range formParams {
+		if len(values) > 0 {
+			params[key] = values[0]
+		}
+	}
+
+	// Execute the plugin
+	response, err := plugin.Execute(params)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	// Handle different response types
+	switch response := response.(type) {
+	case []byte:
+		return c.Blob(http.StatusOK, "application/json", response)
+	case templ.Component:
+		return response.Render(c.Request().Context(), c.Response().Writer)
+	default:
+		return c.JSON(http.StatusOK, response)
+	}
 }
 
 func ExecutePlugin(name string, params map[string]string) (interface{}, error) {

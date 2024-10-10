@@ -1,6 +1,8 @@
 package server
 
 import (
+	"pewito/internal/plugins"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,5 +16,6 @@ func setupRoutes(e *echo.Echo) {
 	e.GET("/docs/:title", handleDocs)
 	e.GET("/playground", handlePlayground)
 	e.GET("/plugins", handlePlugins)
-	e.POST("/plugins/:pluginName", handlePluginExecute)
+	
+	plugins.ApplyPluginRoutes(e)
 }

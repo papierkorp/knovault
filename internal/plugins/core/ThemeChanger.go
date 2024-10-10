@@ -1,14 +1,16 @@
 package core
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"context"
 	"pewito/internal/plugins"
 	"pewito/internal/themes"
+	"pewito/internal/types"
 
 	"github.com/a-h/templ"
+	"github.com/labstack/echo/v4"
 )
 type ThemeChangerPlugin struct{}
 
@@ -31,19 +33,15 @@ func (p *ThemeChangerPlugin) TemplResponse() (templ.Component, error) {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		_, err = fmt.Fprintf(w, `
 			<div>
-				<h3 class="text-lg font-semibold mb-2">Available Themes</h3>
-				<ul class="list-disc pl-5 mb-4">
-					%s
-				</ul>
-				<h4 class="text-md font-semibold mb-2">Current Theme: %s</h4>
+				Select Theme:
 				<form hx-post="/plugins/ThemeChanger" hx-swap="outerHTML">
 					<select name="theme" class="border rounded p-1 mr-2">
 						%s
 					</select>
-					<button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Change Theme</button>
+					<button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Save</button>
 				</form>
 			</div>
-		`, p.generateThemeList(availableThemes), currentTheme, p.generateThemeOptions(availableThemes, currentTheme))
+		`, p.generateThemeOptions(availableThemes, currentTheme))
 		return
 	}), nil
 }
@@ -81,6 +79,21 @@ func (p *ThemeChangerPlugin) generateThemeOptions(themes []string, currentTheme 
 		options += fmt.Sprintf(`<option value="%s" %s>%s</option>`, theme, selected, theme)
 	}
 	return options
+}
+
+func (p *ThemeChangerPlugin) Route() types.PluginRoute {
+	return types.PluginRoute{
+		Method: "POST",
+		Path:   "/plugins/ThemeChanger",
+		Handler: func(c echo.Context) error {
+			newTheme := c.FormValue("theme")
+			if err := themes.SetCurrentTheme(newTheme); err != nil {
+				return c.JSON(echo.ErrInternalServerError.Code, map[string]string{"error": err.Error()})
+			}
+			c.Response().Header().Set("HX-Refresh", "true")
+			return c.NoContent(200)
+		},
+	}
 }
 
 func init() {

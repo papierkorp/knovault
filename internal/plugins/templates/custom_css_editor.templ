@@ -1,0 +1,16 @@
+package core
+
+templ CustomCSSEditor(css string, message string) {
+    <div id="custom-css-editor">
+        if message != "" {
+            <p class="text-green-500 mb-4">{ message }</p>
+        }
+        <form hx-post="/plugins/CustomCSS" hx-target="#custom-css-editor">
+            <textarea name="css" rows="20" class="w-full resize p-2 border rounded mb-2 font-mono" style="resize:auto; width:100%;">{ css }</textarea>
+            <div class="flex justify-between">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Save</button>
+                <button type="button" hx-post="/plugins/CustomCSS" hx-vals='{"action": "reset"}' class="bg-red-500 text-white px-4 py-1 rounded">Reset</button>
+            </div>
+        </form>
+    </div>
+}

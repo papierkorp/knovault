@@ -43,11 +43,11 @@ func Settings() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><h1 class=\"mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white\">Settings</h1><div class=\"mb-6\"><h2 class=\"mb-4 text-xl font-bold\">Hello World Plugin Output:</h2>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><h1 class=\"mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white\">Settings</h1><div class=\"mb-6\"><h2 class=\"mb-4 text-xl font-bold mt-8\">Change Theme:</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if plugin, ok := plugins.GetPlugin("HelloWorld"); ok {
+			if plugin, ok := plugins.GetPlugin("ThemeChanger"); ok {
 				if response, err := plugin.TemplResponse(); err == nil {
 					templ_7745c5c3_Err = response.Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
@@ -73,16 +73,16 @@ func Settings() templ.Component {
 					}
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-red-500\">HelloWorld plugin not found</p>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-red-500\">ThemeChanger plugin not found</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h2 class=\"mb-4 text-xl font-bold mt-8\">Theme Changer Plugin:</h2>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h2 class=\"mb-4 text-xl font-bold mt-8\">Custom CSS:</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if plugin, ok := plugins.GetPlugin("ThemeChanger"); ok {
+			if plugin, ok := plugins.GetPlugin("CustomCSS"); ok {
 				if response, err := plugin.TemplResponse(); err == nil {
 					templ_7745c5c3_Err = response.Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
@@ -96,7 +96,7 @@ func Settings() templ.Component {
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(err.Error())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/themes/defaultTheme/templates/settings.templ`, Line: 29, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/themes/defaultTheme/templates/settings.templ`, Line: 29, Col: 64}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func Settings() templ.Component {
 					}
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-red-500\">ThemeChanger plugin not found</p>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-red-500\">CustomCSS plugin not found</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
