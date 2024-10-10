@@ -1,4 +1,4 @@
-package defaultTheme
+package main
 
 import (
 	"github.com/a-h/templ"
@@ -7,7 +7,6 @@ import (
 )
 
 type DefaultTheme struct{}
-
 
 func (t *DefaultTheme) Home() (templ.Component, error) {
 	return templates.Home(), nil
@@ -40,6 +39,10 @@ func (t *DefaultTheme) Playground() (templ.Component, error) {
 func (t *DefaultTheme) Plugins() (templ.Component, error) {
     return templates.Plugins(), nil
 }
+
+var Theme DefaultTheme
+
+func main() {}
 
 func init() {
 	themes.RegisterTheme("defaultTheme", &DefaultTheme{})

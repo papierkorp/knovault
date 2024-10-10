@@ -2,8 +2,6 @@ package server
 
 import (
 	"pewito/internal/themes"
-	_ "pewito/internal/themes/defaultTheme"
-	_ "pewito/internal/themes/secondTheme"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -15,6 +13,10 @@ import (
 func Start() {
     e := echo.New()
 
+    if err := themes.LoadThemes(); err != nil {
+        log.Fatalf("Failed to load themes: %v", err)
+    }
+    
     err := themes.SetCurrentTheme("defaultTheme")
     if err != nil {
         log.Fatalf("Failed to set default theme: %v", err)

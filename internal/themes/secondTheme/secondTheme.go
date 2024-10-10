@@ -1,4 +1,4 @@
-package secondTheme
+package main
 
 import (
 	"github.com/a-h/templ"
@@ -7,7 +7,6 @@ import (
 )
 
 type SecondTheme struct{}
-
 
 func (t *SecondTheme) Home() (templ.Component, error) {
 	return templates.Home(), nil
@@ -41,7 +40,12 @@ func (t *SecondTheme) Plugins() (templ.Component, error) {
 	return templates.Plugins(), nil
 }
 
+// This is the exported symbol that the plugin loader will look for
+var Theme SecondTheme
 
+func main() {}
+
+// This init function is not necessary for the plugin but can be useful for testing
 func init() {
 	themes.RegisterTheme("secondTheme", &SecondTheme{})
 }

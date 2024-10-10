@@ -2,8 +2,11 @@ package themes
 
 import (
     "fmt"
-    "pewito/internal/types"
+    "io/ioutil"
     "log"
+    "path/filepath"
+    "pewito/internal/types"
+    "plugin"
     "sync"
 )
 
@@ -12,6 +15,47 @@ var (
     currentTheme types.Theme
     themeMutex   sync.RWMutex
 )
+
+func LoadThemes() error {
+    themesDir := "./internal/themes"
+    entries, err := ioutil.ReadDir(themesDir)
+    if err != nil {
+        return fmt.Errorf("failed to read themes directory: %v", err)
+    }
+
+    for _, entry := range entries {
+        if entry.IsDir() {
+            themeName := entry.Name()
+            themePluginPath := filepath.Join(themesDir, themeName, themeName+".so")
+
+            p, err := plugin.Open(themePluginPath)
+            if err != nil {
+                log.Printf("Failed to load theme %s: %v", themeName, err)
+                continue
+            }
+
+            symTheme, err := p.Lookup("Theme")
+            if err != nil {
+                log.Printf("Failed to find Theme symbol in %s: %v", themeName, err)
+                continue
+            }
+
+            theme, ok := symTheme.(types.Theme)
+            if !ok {
+                log.Printf("Unexpected type for Theme in %s", themeName)
+                continue
+            }
+
+            RegisterTheme(themeName, theme)
+        }
+    }
+
+    if len(themes) == 0 {
+        return fmt.Errorf("no themes were loaded")
+    }
+
+    return nil
+}
 
 func RegisterTheme(name string, theme types.Theme) {
     themeMutex.Lock()
