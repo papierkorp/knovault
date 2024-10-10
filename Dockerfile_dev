@@ -1,0 +1,27 @@
+FROM pewito_base:latest
+
+WORKDIR /app
+
+# Copy the Go module files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Install Air for live reloading (only in dev)
+RUN go install github.com/air-verse/air@latest
+
+# Copy the rest of the application code
+COPY . .
+
+# Install NPM dependencies
+RUN npm install
+
+# Build the application
+RUN make build
+
+# Expose the application port
+EXPOSE 1323
+
+# Set the entry point for development
+CMD ["air"]
