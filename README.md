@@ -2,6 +2,30 @@
 
 Pewito is a personal wiki and to-do application built with Go, HTMX, Tailwind CSS, and Templ. It uses a `data` folder for storing markdown files and settings, which can be version-controlled with Git.
 
+it should just have one topbar which includes the logo, a search bar, a settings icon, a select project button and a latest changes button
+
+as the main content (everything below the topbar) i want to display the markdown documents as cards where each file has this metadata:
+
+- Title: title
+- Description: first 100 words from the content
+- Type: doc/task/filter
+- Categorie: devops/cooking/develop...
+- Tags: kubernetes/pizza/...
+- content: md content..
+- Project: can be read from the path
+- path: /data/project1/tasks/task1.md
+
+while the front of the card should just include title, type and the first 3 tags + a button for more details
+
+the color palette is:
+
+- primary: #81a15a
+- accent: #9ece5a
+- neutral: #6b6e72
+- black: #4e5154
+- white: #d1d1d3
+
+
 # Installation process
 
 ```bash
