@@ -26,10 +26,13 @@ go.work.sum
 # env file
 .env
 
+bin/
 
 # ----------------------------- go templ
 # Output.
 cmd/templ/templ
+**/*_templ.go
+
 
 # Logs.
 cmd/templ/lspcmd/*log.txt
