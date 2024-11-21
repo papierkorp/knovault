@@ -3,10 +3,10 @@ package core
 import (
 	"encoding/json"
 	"fmt"
-	"pewito/internal/plugins"
-	"pewito/internal/themes"
-	"pewito/internal/types"
-	pluginTemplates "pewito/internal/plugins/templates"
+	"knovault/internal/plugins"
+	"knovault/internal/themes"
+	"knovault/internal/types"
+	pluginTemplates "knovault/internal/plugins/templates"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"

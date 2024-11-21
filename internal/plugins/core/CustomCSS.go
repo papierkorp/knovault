@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"pewito/internal/plugins"
-	pluginTemplates "pewito/internal/plugins/templates"
-	"pewito/internal/types"
+	"knovault/internal/plugins"
+	pluginTemplates "knovault/internal/plugins/templates"
+	"knovault/internal/types"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"

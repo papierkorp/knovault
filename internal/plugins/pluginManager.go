@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"pewito/internal/types"
-	_ "pewito/internal/plugins/templates"
+	"knovault/internal/types"
+	_ "knovault/internal/plugins/templates"
 	"plugin"
 	"sync"
 

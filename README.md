@@ -1,6 +1,6 @@
-# Pewito: Personal Wiki and To-dos
+# knovault: Knowledgevault - Personal Wiki and To-dos
 
-Pewito is a personal wiki and to-do application built with Go, HTMX, Tailwind CSS, and Templ. It uses a `data` folder for storing markdown files and settings, which can be version-controlled with Git.
+knovault is a personal wiki and to-do application built with Go, HTMX and Templ. It uses a `data` folder for storing markdown files and settings, which can be version-controlled with Git.
 
 it should just have one topbar which includes the logo, a search bar, a settings icon, a select project button and a latest changes button
 
@@ -25,13 +25,12 @@ the color palette is:
 - black: #4e5154
 - white: #d1d1d3
 
-
 # Installation process
 
 ```bash
 # go projekt vorbereiten
-mkdir pewito && cd pewito
-go mod init pewito
+mkdir knovault && cd knovault
+go mod init knovault
 go mod tidy
 
 go install github.com/air-verse/air@latest
@@ -71,7 +70,7 @@ Follow these steps to set up your development environment:
 2. Install Node.js and npm: https://nodejs.org/
 
 3. Clone the repository:
-4. `git clone https://github.com/your-username/pewito.git`
+4. `git clone https://github.com/your-username/knovault.git`
 
 5. Install Go dependencies: `go mod tidy`
 
@@ -118,8 +117,8 @@ package myNewTheme
 
 import (
     "github.com/a-h/templ"
-    "pewito/internal/themes"
-    "pewito/internal/themes/myNewTheme/templates"
+    "knovault/internal/themes"
+    "knovault/internal/themes/myNewTheme/templates"
 )
 
 type MyNewTheme struct{}
@@ -144,7 +143,7 @@ func init() {
 ```go
 import (
     // ... other imports ...
-    _ "pewito/internal/themes/myNewTheme"
+    _ "knovault/internal/themes/myNewTheme"
 )
 ```
 
@@ -174,7 +173,7 @@ package core
 
 import (
     "encoding/json"
-    "pewito/internal/plugins"
+    "knovault/internal/plugins"
     "github.com/a-h/templ"
 )
 

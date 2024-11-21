@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/a-h/templ"
-	"pewito/internal/themes"
-	"pewito/internal/themes/defaultTheme/templates"
+	"knovault/internal/themes"
+	"knovault/internal/themes/defaultTheme/templates"
 )
 
 type DefaultTheme struct{}

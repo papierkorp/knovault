@@ -1,13 +1,13 @@
 package server
 
 import (
-	"pewito/internal/themes"
+	"knovault/internal/themes"
 	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"pewito/internal/plugins"
-	_ "pewito/internal/plugins/core"
+	"knovault/internal/plugins"
+	_ "knovault/internal/plugins/core"
 )
 
 func Start() {

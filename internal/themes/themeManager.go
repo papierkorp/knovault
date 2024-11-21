@@ -5,7 +5,7 @@ import (
     "io/ioutil"
     "log"
     "path/filepath"
-    "pewito/internal/types"
+    "knovault/internal/types"
     "plugin"
     "sync"
 )

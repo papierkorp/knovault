@@ -1,4 +1,4 @@
-FROM pewito_base:latest
+FROM knovault_base:latest
 
 WORKDIR /app
 

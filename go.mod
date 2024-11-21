@@ -1,4 +1,4 @@
-module pewito
+module knovault
 
 go 1.22
 

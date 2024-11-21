@@ -1,7 +1,7 @@
 package main
 
 import (
-    "pewito/internal/server"
+    "knovault/internal/server"
 )
 
 func main() {

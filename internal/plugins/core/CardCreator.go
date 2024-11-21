@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"pewito/internal/plugins"
-	"pewito/internal/plugins/templates/CardCreator"
-	"pewito/internal/types"
+	"knovault/internal/plugins"
+	"knovault/internal/plugins/templates/CardCreator"
+	"knovault/internal/types"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"

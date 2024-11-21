@@ -1,7 +1,7 @@
 package server
 
 import (
-	"pewito/internal/plugins"
+	"knovault/internal/plugins"
 
 	"github.com/labstack/echo/v4"
 )

@@ -1,26 +1,26 @@
 package templates
 
 templ CustomCSSEditor(css string, message string) {
-    <div id="custom-css-editor" class="mt-6">
+    <div id="custom-css-editor">
         if message != "" {
-            <p class="text-green-500 mb-4">{ message }</p>
+            <p>{ message }</p>
         }
-        <h2 class="text-xl font-bold">Custom CSS</h2>
+        <h2>Custom CSS</h2>
         <form hx-post="/plugins/CustomCSS" 
               hx-target="#custom-css-editor"
               hx-swap="outerHTML"
               hx-trigger="submit"
               hx-boost="false">
-            <textarea name="css" id="customcsstextarea" rows="20" class="w-full resize p-2 border rounded mb-2 font-mono" style="resize:auto; width:100%;">{ css }</textarea>
-            <div class="flex justify-between">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Save and Reload</button>
+            <textarea name="css" id="customcsstextarea" rows="20" style="resize:auto; width:100%;">{ css }</textarea>
+            <div>
+                <button type="submit">Save and Reload</button>
                 <button type="button" 
                         hx-post="/plugins/CustomCSS" 
                         hx-vals='{"action": "reset"}'
                         hx-target="#custom-css-editor"
                         hx-swap="outerHTML"
                         hx-boost="false"
-                        class="bg-red-500 text-white px-4 py-1 rounded">Reset and Reload</button>
+                        >Reset and Reload</button>
             </div>
         </form>
     </div>
