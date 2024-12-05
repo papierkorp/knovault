@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"knovault/internal/plugins"
-	_ "knovault/internal/plugins/core"
 )
 
 func Start() {
@@ -20,6 +19,10 @@ func Start() {
     err := themes.SetCurrentTheme("defaultTheme")
     if err != nil {
         log.Fatalf("Failed to set default theme: %v", err)
+    }
+
+    if err := plugins.LoadCorePlugins(); err != nil {
+        log.Printf("Error loading core plugins: %v", err)
     }
 
     if err := plugins.LoadCommonPlugins(); err != nil {

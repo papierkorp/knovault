@@ -1,0 +1,21 @@
+package templates
+
+import (
+	"knovault/internal/themes/core/defaultTheme/templates/layout"
+)
+
+
+templ Home() {
+	@layout.Base("Home") {
+		<div>
+			<ul>
+				<li><a href="/">home</a></li>
+				<li><a href="/help">help</a></li>
+				<li><a href="/playground">playground</a></li>
+				<li><a href="/search">search</a></li>
+				<li><a href="/settings">settings</a></li>
+				<li><a href="/docs">docs</a></li>
+			</ul>
+		</div>
+	}
+}

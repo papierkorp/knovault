@@ -1,0 +1,31 @@
+package templates
+
+import (
+    "knovault/internal/themes/core/Dark/templates/layout"
+    "knovault/internal/plugins"
+)
+
+templ Docs(title string) {
+	@layout.Base("Docs") {
+		<h1>{ title }</h1>
+
+		<div>
+            if plugin, ok := plugins.GetPlugin("Parser"); ok {
+                if response, err := plugin.Execute(map[string]string{"filePath": title}); err == nil {
+                    if templComponent, ok := response.(templ.Component); ok {
+                        @templComponent
+                    } else {
+                        <p>Unexpected response type from Parser plugin</p>
+                    }
+                } else {
+                    <p>Error: { err.Error() }</p>
+                }
+            } else {
+                <p>Parser plugin not found</p>
+            }
+		</div>
+		<div>
+			test
+		</div>
+	}
+}
