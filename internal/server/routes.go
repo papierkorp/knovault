@@ -1,21 +1,20 @@
 package server
 
 import (
-	"knovault/internal/plugins"
-
-	"github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4"
+    "knovault/internal/globals"
 )
 
 func setupRoutes(e *echo.Echo) {
-	e.GET("/", handleHome)
-	e.GET("/home", handleHome)
-	e.GET("/help", handleHelp)
-	e.GET("/settings", handleSettings)
-	e.GET("/search", handleSearch)
-	e.GET("/docs", handleDocsRoot)
-	e.GET("/docs/:title", handleDocs)
-	e.GET("/playground", handlePlayground)
-	e.GET("/plugins", handlePlugins)
-	
-	plugins.ApplyPluginRoutes(e)
+    e.GET("/", handleHome)
+    e.GET("/home", handleHome)
+    e.GET("/help", handleHelp)
+    e.GET("/settings", handleSettings)
+    e.GET("/search", handleSearch)
+    e.GET("/docs", handleDocsRoot)
+    e.GET("/docs/:title", handleDocs)
+    e.GET("/playground", handlePlayground)
+    e.GET("/plugins", handlePlugins)
+
+    globals.GetAssetManager().ApplyPluginRoutes(e)
 }

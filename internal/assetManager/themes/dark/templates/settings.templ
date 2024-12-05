@@ -1,0 +1,19 @@
+// internal/assetManager/themes/defaultTheme/templates/settings.templ
+
+package templates
+
+import (
+    "knovault/internal/assetManager/themes/dark/templates/layout"
+    "knovault/internal/globals"
+)
+
+templ Settings() {
+    @layout.Base("Settings") {
+        <div>
+            <h1>Settings</h1>
+            for _, extension := range globals.GetAssetManager().GetPluginTemplateExtensions("settings") {
+                @extension
+            }
+        </div>
+    }
+}

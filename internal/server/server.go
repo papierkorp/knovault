@@ -1,37 +1,32 @@
+// internal/server/server.go
+
 package server
 
 import (
-	"knovault/internal/themes"
-	"log"
+    "log"
+    "knovault/internal/assetManager"
+    "knovault/internal/globals"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"knovault/internal/plugins"
+    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4/middleware"
 )
 
 func Start() {
     e := echo.New()
 
-    if err := themes.LoadThemes(); err != nil {
-        log.Fatalf("Failed to load themes: %v", err)
+    manager := assetManager.NewAssetManager()
+    globals.SetAssetManager(manager)
+
+    if err := manager.LoadAssets(); err != nil {
+        log.Fatalf("Failed to load assets: %v", err)
     }
-    
-    err := themes.SetCurrentTheme("defaultTheme")
+
+    err := manager.SetCurrentTheme("defaultTheme")
     if err != nil {
         log.Fatalf("Failed to set default theme: %v", err)
     }
 
-    if err := plugins.LoadCorePlugins(); err != nil {
-        log.Printf("Error loading core plugins: %v", err)
-    }
-
-    if err := plugins.LoadCommonPlugins(); err != nil {
-        log.Printf("Error loading common plugins: %v", err)
-    }
-
-
     e.Static("/static", "static")
-
     e.Use(middleware.Logger())
     e.Use(middleware.Recover())
 
@@ -39,4 +34,3 @@ func Start() {
 
     e.Logger.Fatal(e.Start(":1323"))
 }
-

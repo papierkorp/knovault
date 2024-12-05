@@ -1,22 +1,20 @@
 package server
 
 import (
-	"knovault/internal/themes"
-	"github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4"
+    "knovault/internal/globals"
 )
 
-
 func handleHome(c echo.Context) error {
-	component, err := themes.GetCurrentTheme().Home()
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    component, err := globals.GetAssetManager().GetCurrentTheme().Home()
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
-
 func handlePlayground(c echo.Context) error {
-    component, err := themes.GetCurrentTheme().Playground()
+    component, err := globals.GetAssetManager().GetCurrentTheme().Playground()
     if err != nil {
         return err
     }
@@ -24,51 +22,50 @@ func handlePlayground(c echo.Context) error {
 }
 
 func handleHelp(c echo.Context) error {
-	component, err := themes.GetCurrentTheme().Help()
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    component, err := globals.GetAssetManager().GetCurrentTheme().Help()
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
 func handleSettings(c echo.Context) error {
-	component, err := themes.GetCurrentTheme().Settings()
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    component, err := globals.GetAssetManager().GetCurrentTheme().Settings()
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
 func handleSearch(c echo.Context) error {
-	component, err := themes.GetCurrentTheme().Search()
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    component, err := globals.GetAssetManager().GetCurrentTheme().Search()
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
 func handleDocsRoot(c echo.Context) error {
-	component, err := themes.GetCurrentTheme().DocsRoot()
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    component, err := globals.GetAssetManager().GetCurrentTheme().DocsRoot()
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
 func handleDocs(c echo.Context) error {
-	title := c.Param("title")
-	component, err := themes.GetCurrentTheme().Docs(title)
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    title := c.Param("title")
+    component, err := globals.GetAssetManager().GetCurrentTheme().Docs(title)
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }
 
-
 func handlePlugins(c echo.Context) error {
-	component, err := themes.GetCurrentTheme().Plugins()
-	if err != nil {
-		return err
-	}
-	return _render(c, component)
+    component, err := globals.GetAssetManager().GetCurrentTheme().Plugins()
+    if err != nil {
+        return err
+    }
+    return _render(c, component)
 }

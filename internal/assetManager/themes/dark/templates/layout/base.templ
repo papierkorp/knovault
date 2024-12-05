@@ -1,0 +1,37 @@
+// internal/assetManager/themes/defaultTheme/templates/layout/base.templ
+
+package layout
+
+templ Base(title string) {
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>{ title }</title>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <link href="/static/css/style.css" rel="stylesheet"/>
+            <link href="/static/css/custom.css" rel="stylesheet"/>
+        </head>
+        <body>
+            <div id="wrapper">
+                @header()
+                @htmx()
+                <hr />
+                <main>
+                    { children... }
+                </main>
+            </div>
+        </body>
+    </html>
+}
+
+templ header() {
+    <header>
+        <a href="/">HOME</a>
+        | dark |
+    </header>
+}
+
+templ htmx() {
+    <script src="/static/htmx.min.js"></script>
+}
