@@ -1,6 +1,8 @@
 # knovault: Knowledgevault - Personal Wiki and To-dos
 
-knovault is a personal wiki and to-do application built with Go, HTMX and Templ. It uses a `data` folder for storing markdown files and settings, which can be version-controlled with Git.
+Personal wiki and to-do application built with Go, HTMX, and Templ.
+
+## Design Choices
 
 it should just have one topbar which includes the logo, a search bar, a settings icon, a select project button and a latest changes button
 
@@ -17,7 +19,14 @@ as the main content (everything below the topbar) i want to display the markdown
 
 while the front of the card should just include title, type and the first 3 tags + a button for more details
 
-the color palette is:
+## Core Features
+
+- Markdown file storage in `data` folder with Git version control
+- Plugin system for extensibility
+- Theme system for customizable UI
+- HTMX integration for dynamic content
+
+## Color palette
 
 - primary: #81a15a
 - accent: #9ece5a
@@ -49,11 +58,7 @@ go install github.com/a-h/templ/cmd/templ@latest
 go get github.com/a-h/templ@v0.2.747
 templ generate
 
-npm install -D tailwindcss
-npx tailwindcss init
-vi tailwind.config.js
 vi static/css/main.css
-npx tailwindcss -i ./static/css/main.css -o ./static/css/output.css --watch
 
 cd static && wget https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js # --minify
 
@@ -61,24 +66,38 @@ cd static && wget https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js # --minify
 
 # Setup
 
-## Setting Up the Development Environment
+## Prerequisites
 
-Follow these steps to set up your development environment:
+1. Go 1.16+
+2. `go install github.com/a-h/templ/cmd/templ@latest`
+3. `go install github.com/cosmtrek/air@latest`
 
-1. Install Go (1.16 or later): https://golang.org/doc/install
+## Development
 
-2. Install Node.js and npm: https://nodejs.org/
+```bash
+make dev  # Starts development server with live reload
+```
 
-3. Clone the repository:
-4. `git clone https://github.com/your-username/knovault.git`
+## Project Structure
 
-5. Install Go dependencies: `go mod tidy`
-
-6. Install Templ: `go install github.com/a-h/templ/cmd/templ@latest`
-
-7. Install Tailwind CSS: `npm install`
-
-8. Install Air for live reloading (optional): `go install github.com/cosmtrek/air@latest`
+```
+.
+├── internal/
+│   ├── plugins/
+│   │   ├── core/       # Core plugins with source code
+│   │   │   └── PluginName/
+│   │   │       ├── main.go
+│   │   │       ├── PluginName.so
+│   │   │       └── templates/
+│   │   └── common/    # Runtime-loadable plugins (.so only)
+│   └── themes/
+│       ├── core/      # Core themes with source code
+│       │   └── ThemeName/
+│       │       ├── main.go
+│       │       ├── ThemeName.so
+│       │       └── templates/
+│       └── common/    # Runtime-loadable themes (.so only)
+```
 
 ## Running the Application
 
@@ -104,146 +123,73 @@ This command will generate Templ files, build Tailwind CSS, and start the applic
 
 Open your browser and navigate to [http://localhost:132](http://localhost:1323) to see the application.
 
-## Creating a New Theme
+## Creating Plugins
 
-To create a new theme:
+1. Create plugin directory structure:
 
-1. Create a new directory under `internal/themes` for your theme (e.g., `internal/themes/myNewTheme`).
+```bash
+mkdir -p internal/plugins/core/MyPlugin/templates
+```
 
-2. Create a Go file for your theme (e.g., `myNewTheme.go`) with the following structure:
+2. Implement the plugin interface in `main.go`:
 
 ```go
-package myNewTheme
+package main
 
-import (
-    "github.com/a-h/templ"
-    "knovault/internal/themes"
-    "knovault/internal/themes/myNewTheme/templates"
-)
+type MyPlugin struct{}
 
-type MyNewTheme struct{}
+func (p *MyPlugin) Name() string {
+    return "MyPlugin"
+}
 
-func (t *MyNewTheme) Home() (templ.Component, error) {
+// Implement other required methods...
+
+var Plugin = MyPlugin{}
+```
+
+3. Add templates in the templates directory if needed
+4. Plugin will be compiled automatically on server start
+
+## Creating Themes
+
+1. Create theme directory structure:
+
+```bash
+mkdir -p internal/themes/core/MyTheme/templates/layout
+```
+
+2. Implement the theme interface in `main.go`:
+
+```go
+package main
+
+type MyTheme struct{}
+
+func (t *MyTheme) Home() (templ.Component, error) {
     return templates.Home(), nil
 }
 
-// Implement other methods (Help, Settings, Search, DocsRoot, Docs, Playground, Plugins)
+// Implement other required methods...
 
-func init() {
-    themes.RegisterTheme("myNewTheme", &MyNewTheme{})
-}
+var Theme = MyTheme{}
 ```
 
-3. Create a `templates` directory inside your theme directory and add Templ files for each component (e.g., `home.templ`, `help.templ`, etc.).
+3. Add templates and layout files
+4. Theme will be compiled automatically on server start
 
-4. Implement the theme's design in these Templ files using Tailwind CSS classes.
+## Runtime Plugin/Theme Installation
 
-5. Update `server.go` to import your new theme:
+- Copy compiled .so files to respective common directories
+- System will detect and load automatically
+- No server restart required
 
-```go
-import (
-    // ... other imports ...
-    _ "knovault/internal/themes/myNewTheme"
-)
-```
+## Available Make Commands
 
-6. To use the new theme, set it as the current theme in `server.go`:
-
-```go
-err := themes.SetCurrentTheme("myNewTheme")
-if err != nil {
- log.Fatalf("Failed to set new theme: %v", err)
-}
-```
-
-7. After creating or modifying Templ files, run: `make templ-generate`
-
-8. If you've made changes to Tailwind classes, rebuild the CSS: `make tailwind-build`
-
-## Creating a New Plugin
-
-To create a new plugin:
-
-1. Create a new Go file in the `internal/plugins/core` directory (e.g., `MyNewPlugin.go`).
-
-2. Implement the `Plugin` interface:
-
-```go
-package core
-
-import (
-    "encoding/json"
-    "knovault/internal/plugins"
-    "github.com/a-h/templ"
-)
-
-type MyNewPlugin struct{}
-
-func (p *MyNewPlugin) Name() string {
-    return "MyNewPlugin"
-}
-
-func (p *MyNewPlugin) Description() string {
-    return "Description of what your plugin does"
-}
-
-func (p *MyNewPlugin) Help() string {
-    return "Instructions on how to use your plugin"
-}
-
-func (p *MyNewPlugin) TemplResponse() (templ.Component, error) {
-    // Implement this method if your plugin returns a templ Component
-    return templ.Raw("Your templ component here"), nil
-}
-
-func (p *MyNewPlugin) JsonResponse() ([]byte, error) {
-    // Implement this method if your plugin returns JSON
-    response := map[string]string{
-        "key": "value",
-    }
-    return json.Marshal(response)
-}
-
-func (p *MyNewPlugin) Execute(params map[string]string) (interface{}, error) {
-    // Implement the main functionality of your plugin here
-    return "Plugin execution result", nil
-}
-
-func init() {
-    plugins.RegisterCorePlugin("MyNewPlugin", &MyNewPlugin{})
-}
-```
-
-3. If your plugin requires a custom route, implement the `PluginWithRoute` interface:
-
-```go
-func (p *MyNewPlugin) Route() types.PluginRoute {
-    return types.PluginRoute{
-        Method: "POST",
-        Path:   "/plugins/MyNewPlugin",
-        Handler: func(c echo.Context) error {
-            // Implement your route handler here
-        },
-    }
-}
-```
-
-4. If your plugin extends templates, implement the `PluginWithTemplateExtensions` interface:
-
-```go
-func (p *MyNewPlugin) ExtendTemplate(templateName string) (templ.Component, error) {
-    switch templateName {
-    case "settings":
-        return templ.Raw("<div>My plugin extension</div>"), nil
-    default:
-        return nil, fmt.Errorf("template %s not supported by MyNewPlugin", templateName)
-    }
-}
-```
-
-5. Update any relevant UI components (e.g., `playground.templ` or `settings.templ`) to include your new plugin if necessary.
-
-6. After creating or modifying a plugin, rebuild the application: `make build`
+- `make dev`: Development mode with live reload
+- `make build`: Production build
+- `make docker-build-dev`: Build development Docker image
+- `make docker-build-prod`: Build production Docker image
+-
 
 ## Contributing
 

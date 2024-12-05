@@ -3,60 +3,51 @@ APP_NAME := knovault
 THEMES_DIR := ./internal/themes
 PLUGINS_DIR := ./internal/plugins
 
-.PHONY: clean-plugins
+# Common clean function for both plugins and themes
+define clean_artifacts
+	@echo "Cleaning up $(1) artifacts..."
+	@find $(2)/core -name "internal" -type d -exec rm -rf {} +
+	@find $(2)/core -name "*.so" -type f -delete
+endef
+
+# Common build function for both plugins and themes
+define build_components
+	@echo "Building $(1)..."
+	@for item in $(2)/core/*; do \
+		if [ -d "$$item" ]; then \
+			name=$$(basename $$item); \
+			echo "Building $$name..."; \
+			cd $$item && go build -buildmode=plugin -o $$name.so main.go && cd -; \
+		fi \
+	done
+endef
+
+.PHONY: clean-plugins clean-themes templ-generate build-themes build-plugins ensure-dirs dev build docker-build-base docker-build-dev docker-build-prod docker-run-dev docker-run-prod docker-stop
+
 clean-plugins:
-	@echo "Cleaning up plugin artifacts..."
-	@find $(PLUGINS_DIR)/core -name "internal" -type d -exec rm -rf {} +
-	@find $(PLUGINS_DIR)/core -name "*.so" -type f -delete
+	$(call clean_artifacts,plugin,$(PLUGINS_DIR))
 
-.PHONY: clean-themes
 clean-themes:
-	@echo "Cleaning up theme artifacts..."
-	@find $(THEMES_DIR)/core -name "internal" -type d -exec rm -rf {} +
-	@find $(THEMES_DIR)/core -name "*.so" -type f -delete
+	$(call clean_artifacts,theme,$(THEMES_DIR))
 
-.PHONY: templ-generate
 templ-generate:
 	TEMPL_EXPERIMENT=rawgo templ generate
 
-.PHONY: build-themes
 build-themes: clean-themes
-	@echo "Building theme plugins..."
-	@for theme in $(THEMES_DIR)/core/*; do \
-		if [ -d "$$theme" ]; then \
-			theme_name=$$(basename $$theme); \
-			echo "Building $$theme_name..."; \
-			cd $$theme && go build -buildmode=plugin -o $$theme_name.so main.go && cd -; \
-		fi \
-	done
+	$(call build_components,theme plugins,$(THEMES_DIR))
 
-.PHONY: build-plugins
 build-plugins: clean-plugins
-	@echo "Building plugins..."
-	@for plugin in $(PLUGINS_DIR)/core/*; do \
-		if [ -d "$$plugin" ]; then \
-			plugin_name=$$(basename $$plugin); \
-			echo "Building $$plugin_name..."; \
-			cd $$plugin && go build -buildmode=plugin -o $$plugin_name.so main.go && cd -; \
-		fi \
-	done
+	$(call build_components,plugins,$(PLUGINS_DIR))
 
-.PHONY: ensure-dirs
 ensure-dirs:
-	@mkdir -p $(THEMES_DIR)/core
-	@mkdir -p $(THEMES_DIR)/common
-	@mkdir -p $(PLUGINS_DIR)/core
-	@mkdir -p $(PLUGINS_DIR)/common
+	@mkdir -p $(THEMES_DIR)/core $(THEMES_DIR)/common $(PLUGINS_DIR)/core $(PLUGINS_DIR)/common
 
-.PHONY: dev
 dev: ensure-dirs templ-generate build-themes build-plugins
 	go build -o ./bin/$(APP_NAME) ./cmd/main.go && air
 
-.PHONY: build
 build: ensure-dirs templ-generate build-themes build-plugins
 	go build -o ./bin/$(APP_NAME) ./cmd/main.go
 
-.PHONY: docker-build-base
 docker-build-base:
 	@if [ -z "$$(docker images -q knovault_base:latest 2> /dev/null)" ]; then \
 		echo "Building knovault_base image..."; \
@@ -65,25 +56,14 @@ docker-build-base:
 		echo "knovault_base image already exists. Skipping build."; \
 	fi
 
-.PHONY: docker-build-dev
-docker-build-dev: docker-build-base
-	docker build -t knovault:dev -f Dockerfile.dev .
+docker-build-%: docker-build-base
+	docker build -t knovault:$* -f Dockerfile.$* .
 
-.PHONY: docker-build-prod
-docker-build-prod: docker-build-base
-	docker build -t knovault:prod -f Dockerfile.prod .
+docker-run-%:
+	docker run -d --name knovault-$* -p 1323:1323 \
+		$(if $(findstring dev,$*),-v $(PWD):/app,-v $(PWD)/data:/app/data) \
+		knovault:$*
 
-.PHONY: docker-run-dev
-docker-run-dev:
-	docker run -d --name knovault-dev -p 1323:1323 -v $(PWD):/app knovault:dev
-
-.PHONY: docker-run-prod
-docker-run-prod:
-	docker run -d --name knovault-prod -p 1323:1323 -v $(PWD)/data:/app/data knovault:prod
-
-.PHONY: docker-stop
 docker-stop:
-	-docker stop knovault-dev
-	-docker rm knovault-dev
-	-docker stop knovault-prod
-	-docker rm knovault-prod
+	-docker stop knovault-dev knovault-prod
+	-docker rm knovault-dev knovault-prod
