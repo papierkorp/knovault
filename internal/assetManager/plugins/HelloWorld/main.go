@@ -1,9 +1,11 @@
 package main
 
 import (
-    "knovault/internal/pluginManager/plugins/HelloWorld/plugin"
+    "knovault/internal/assetManager/plugins/HelloWorld/plugin"
+    "knovault/internal/types"
 )
 
-var Plugin = plugin.Plugin
+// Export Plugin symbol as an interface
+var Plugin types.Plugin = plugin.Plugin
 
 func main() {}

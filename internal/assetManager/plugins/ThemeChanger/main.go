@@ -1,9 +1,11 @@
 package main
 
 import (
-    "knovault/internal/pluginManager/plugins/ThemeChanger/plugin"
+    "knovault/internal/assetManager/plugins/ThemeChanger/plugin"
+    "knovault/internal/types"
 )
 
-var Plugin = plugin.Plugin
+// Export Plugin symbol as an interface
+var Plugin types.Plugin = plugin.Plugin
 
 func main() {}

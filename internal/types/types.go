@@ -41,9 +41,9 @@ type PluginWithTemplateExtensions interface {
 
 // PluginInfo structure for plugin metadata
 type PluginInfo struct {
-    Name        string
-    Description string
-    Type        string // "core" or "common"
+    Name        string   `json:"name"`
+    Description string   `json:"description"`
+    Tags        []string `json:"tags"`
 }
 
 // PluginRoute structure for plugin routes

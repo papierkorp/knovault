@@ -1,10 +1,11 @@
 package main
 
 import (
-    "knovault/internal/pluginManager/plugins/CustomCSS/plugin"
+    "knovault/internal/assetManager/plugins/CustomCSS/plugin"
+    "knovault/internal/types"
 )
 
-// Export for plugin compilation
-var Plugin = plugin.Plugin
+// Export Plugin symbol as an interface
+var Plugin types.Plugin = plugin.Plugin
 
 func main() {}

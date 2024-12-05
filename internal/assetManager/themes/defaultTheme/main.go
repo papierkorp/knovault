@@ -1,7 +1,7 @@
 package main
 
 import (
-    "knovault/internal/themeManager/themes/defaultTheme/plugin"
+    "knovault/internal/assetManager/themes/defaultTheme/plugin"
 )
 
 var Theme = plugin.Theme

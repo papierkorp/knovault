@@ -1,0 +1,34 @@
+{
+  "plugins": [
+    {
+      "name": "CustomCSS",
+      "path": "internal/assetManager/plugins/CustomCSS/plugin",
+      "enabled": true,
+      "tags": ["built-in", "customization"]
+    },
+    {
+      "name": "FileManager",
+      "path": "internal/assetManager/plugins/FileManager/plugin",
+      "enabled": true,
+      "tags": ["built-in", "core"]
+    },
+    {
+      "name": "HelloWorld",
+      "path": "internal/assetManager/plugins/HelloWorld/plugin",
+      "enabled": true,
+      "tags": ["built-in", "example"]
+    },
+    {
+      "name": "MarkdownParser",
+      "path": "internal/assetManager/plugins/MarkdownParser/plugin",
+      "enabled": true,
+      "tags": ["built-in", "core"]
+    },
+    {
+      "name": "ThemeChanger",
+      "path": "internal/assetManager/plugins/ThemeChanger/plugin",
+      "enabled": true,
+      "tags": ["built-in", "customization"]
+    }
+  ]
+}
