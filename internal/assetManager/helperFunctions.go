@@ -4,8 +4,8 @@ import (
     "encoding/json"
     "fmt"
     "os"
-    "os/exec"
     "path/filepath"
+    "log"
 )
 
 func loadConfig[T any](path string) (*T, error) {
@@ -31,48 +31,54 @@ func hasTag(tags []string, target string) bool {
     return false
 }
 
-func compileModule(pkgPath, outputPath string) error {
-    // Ensure the output directory exists
-    outputDir := filepath.Dir(outputPath)
-    if err := os.MkdirAll(outputDir, 0755); err != nil {
-        return fmt.Errorf("failed to create output directory: %v", err)
-    }
+func findAssetFiles(baseDir string) ([]string, error) {
+    var files []string
 
-    // The main.go file should be in the parent directory of the plugin path
-    mainFile := filepath.Join(filepath.Dir(pkgPath), "main.go")
-    if _, err := os.Stat(mainFile); err != nil {
-        return fmt.Errorf("main.go not found at %s: %v", mainFile, err)
-    }
+    // Walk through the directory
+    err := filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {
+        if err != nil {
+            return err
+        }
 
-    // Get absolute paths
-    absMainFile, err := filepath.Abs(mainFile)
+        // Skip directories themselves
+        if info.IsDir() {
+            return nil
+        }
+
+        // Look for .so files
+        if filepath.Ext(path) == ".so" {
+            files = append(files, path)
+            log.Printf("Found .so file: %s", path)
+            return nil
+        }
+
+        // Look for main.go files in the plugin directory
+        if filepath.Base(path) == "plugin.go" &&
+           filepath.Base(filepath.Dir(path)) == "plugin" {
+            files = append(files, path)
+            log.Printf("Found plugin.go file: %s", path)
+        }
+
+        return nil
+    })
+
     if err != nil {
-        return fmt.Errorf("failed to get absolute path for main.go: %v", err)
+        return nil, err
     }
 
-    absOutputPath, err := filepath.Abs(outputPath)
-    if err != nil {
-        return fmt.Errorf("failed to get absolute path for output: %v", err)
+    if len(files) == 0 {
+        log.Printf("No asset files found in directory: %s", baseDir)
+        // Log the directory contents for debugging
+        entries, err := os.ReadDir(baseDir)
+        if err != nil {
+            log.Printf("Error reading directory: %v", err)
+        } else {
+            log.Printf("Directory contents of %s:", baseDir)
+            for _, entry := range entries {
+                log.Printf("  %s (isDir: %v)", entry.Name(), entry.IsDir())
+            }
+        }
     }
 
-    // Get current working directory
-    cwd, err := os.Getwd()
-    if err != nil {
-        return fmt.Errorf("failed to get current working directory: %v", err)
-    }
-
-    // Build the module
-    cmd := exec.Command("go", "build", "-buildmode=plugin", "-o", absOutputPath, absMainFile)
-    cmd.Dir = cwd // Set working directory to project root
-    cmd.Env = append(os.Environ(),
-        "CGO_ENABLED=1",
-        "GO111MODULE=on",
-        fmt.Sprintf("GOPATH=%s", os.Getenv("GOPATH")),
-    )
-
-    if output, err := cmd.CombinedOutput(); err != nil {
-        return fmt.Errorf("compilation failed: %v\nOutput: %s", err, output)
-    }
-
-    return nil
+    return files, nil
 }

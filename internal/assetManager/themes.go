@@ -5,12 +5,11 @@ import (
     "log"
     "path/filepath"
     "plugin"
-    "os"
 
     "knovault/internal/types"
 )
 
-func (am *AssetManager) loadConfiguredThemes() error {
+func (am *AssetManager) loadThemes() error {
     config, err := loadConfig[types.ThemeConfig]("internal/assetManager/themes_list.json")
     if err != nil {
         return err
@@ -19,138 +18,86 @@ func (am *AssetManager) loadConfiguredThemes() error {
     am.mutex.Lock()
     defer am.mutex.Unlock()
 
+    themesDir := "./internal/assetManager/themes"
+    files, err := findAssetFiles(themesDir)
+    if err != nil {
+        return fmt.Errorf("failed to scan themes directory: %v", err)
+    }
+
+    // Create a map of configured themes
+    configuredThemes := make(map[string]types.ThemeMetadata)
     for _, t := range config.Themes {
-        if !t.Enabled {
-            continue
+        if t.Enabled {
+            configuredThemes[t.Name] = t
+            am.themeInfo[t.Name] = t
+        }
+    }
+
+    // Load themes from found files
+    for _, file := range files {
+        // For .so files, get the theme name from the parent directory
+        // For plugin.go files, get the theme name from the grandparent directory
+        var themeName string
+        if filepath.Ext(file) == ".so" {
+            themeName = filepath.Base(filepath.Dir(file))
+        } else {
+            themeName = filepath.Base(filepath.Dir(filepath.Dir(filepath.Dir(file))))
         }
 
-        // Store metadata regardless of loading success
-        am.themeInfo[t.Name] = t
-
-        if hasTag(t.Tags, "built-in") {
-            themePath := filepath.Join(t.Path)
-            soPath := filepath.Join(filepath.Dir(themePath), "plugin.so")
-            if err := compileModule(themePath, soPath); err != nil {
-                log.Printf("Warning: Could not compile theme %s: %v", t.Name, err)
+        // Check if this theme is configured and enabled
+        if metadata, ok := configuredThemes[themeName]; ok {
+            if err := am.loadThemeFromPath(themeName, file); err != nil {
+                log.Printf("Warning: Could not load theme %s: %v", themeName, err)
                 continue
             }
-
-            if err := am.loadThemeFromPath(t.Name, soPath); err != nil {
-                log.Printf("Warning: Could not load theme %s: %v", t.Name, err)
-                continue
-            }
+            am.themeInfo[themeName] = metadata
         }
+    }
+
+    // Verify that themes were actually loaded
+    if len(am.themes) == 0 {
+        return fmt.Errorf("no themes were loaded")
     }
 
     return nil
 }
 
 func (am *AssetManager) loadThemeFromPath(name, path string) error {
-    themePlugin, err := plugin.Open(path)
-    if err != nil {
-        return fmt.Errorf("could not open theme: %v", err)
+    if filepath.Ext(path) == ".so" {
+        // For .so files, load using plugin.Open
+        plug, err := plugin.Open(path)
+        if err != nil {
+            return fmt.Errorf("could not open theme: %v", err)
+        }
+
+        symTheme, err := plug.Lookup("Theme")
+        if err != nil {
+            return fmt.Errorf("could not find Theme symbol: %v", err)
+        }
+
+        // Try both direct interface and pointer conversion
+        if themeInstance, ok := symTheme.(types.Theme); ok {
+            am.themes[name] = themeInstance
+        } else if themePtr, ok := symTheme.(*types.Theme); ok {
+            am.themes[name] = *themePtr
+        } else {
+            return fmt.Errorf("invalid theme type")
+        }
+    } else if filepath.Base(path) == "plugin.go" {
+        // For plugin.go files, assume Theme is a package-level variable
+        // and will be loaded when the plugin is compiled to .so
+        // We'll need to compile it first using go build -buildmode=plugin
+        // pluginDir := filepath.Dir(filepath.Dir(path))
+        // outPath := filepath.Join(pluginDir, name+".so")
+
+        // Remove any existing .so file to avoid loading stale plugins
+        // This is commented out for now as it might be better to handle this in the Makefile
+        // os.Remove(outPath)
+
+        log.Printf("Theme plugin source found at %s. Please compile using: make compile-theme THEME=%s", path, name)
+        return nil
     }
 
-    symTheme, err := themePlugin.Lookup("Theme")
-    if err != nil {
-        return fmt.Errorf("could not find Theme symbol: %v", err)
-    }
-
-    themeInstance, ok := symTheme.(types.Theme)
-    if !ok {
-        return fmt.Errorf("invalid theme type")
-    }
-
-    am.themes[name] = themeInstance
     log.Printf("Loaded theme: %s", name)
-
-    // Set as current theme if it's tagged as default and no current theme
-    if am.currentTheme == nil {
-        metadata, exists := am.themeInfo[name]
-        if exists && hasTag(metadata.Tags, "default") {
-            am.currentTheme = themeInstance
-            log.Printf("Set default theme: %s", name)
-        }
-    }
-
     return nil
-}
-
-func (am *AssetManager) loadCompiledThemes() error {
-    themesDir := "./internal/assetManager/themes"
-    entries, err := os.ReadDir(themesDir)
-    if err != nil {
-        return fmt.Errorf("failed to read themes directory: %v", err)
-    }
-
-    for _, entry := range entries {
-        if !entry.IsDir() && filepath.Ext(entry.Name()) == ".so" {
-            name := filepath.Base(entry.Name())
-            name = name[:len(name)-3] // Remove .so extension
-            path := filepath.Join(themesDir, entry.Name())
-
-            if err := am.loadThemeFromPath(name, path); err != nil {
-                log.Printf("Failed to load theme %s: %v", name, err)
-            }
-        }
-    }
-
-    return nil
-}
-
-// Theme management methods
-func (am *AssetManager) GetCurrentTheme() types.Theme {
-    am.mutex.RLock()
-    defer am.mutex.RUnlock()
-    return am.currentTheme
-}
-
-func (am *AssetManager) SetCurrentTheme(name string) error {
-    am.mutex.Lock()
-    defer am.mutex.Unlock()
-
-    theme, ok := am.themes[name]
-    if !ok {
-        return fmt.Errorf("theme %s not found", name)
-    }
-
-    am.currentTheme = theme
-    log.Printf("Current theme set to: %s", name)
-    return nil
-}
-
-func (am *AssetManager) GetCurrentThemeName() string {
-    am.mutex.RLock()
-    defer am.mutex.RUnlock()
-
-    for name, theme := range am.themes {
-        if theme == am.currentTheme {
-            return name
-        }
-    }
-    return ""
-}
-
-func (am *AssetManager) GetAvailableThemes() []string {
-    am.mutex.RLock()
-    defer am.mutex.RUnlock()
-
-    var names []string
-    for name := range am.themes {
-        names = append(names, name)
-    }
-    return names
-}
-
-func (am *AssetManager) GetThemesByTag(tag string) []string {
-    am.mutex.RLock()
-    defer am.mutex.RUnlock()
-
-    var themes []string
-    for name, metadata := range am.themeInfo {
-        if hasTag(metadata.Tags, tag) {
-            themes = append(themes, name)
-        }
-    }
-    return themes
 }

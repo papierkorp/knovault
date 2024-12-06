@@ -7,6 +7,7 @@ import (
 
 type DefaultTheme struct{}
 
+
 func (t *DefaultTheme) Home() (templ.Component, error) {
     return templates.Home(), nil
 }
