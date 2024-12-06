@@ -1,27 +1,35 @@
-FROM knovault_base:latest
+FROM golang:1.23-bookworm
+
+# Set DNS servers explicitly
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+
+# Set Go environment variables
+ENV GOPROXY=https://proxy.golang.org,direct
+ENV GOSUMDB=off
+ENV GO111MODULE=on
+
+# Install necessary development dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    make \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy the Go module files
+# Copy go.mod and go.sum first to leverage Docker cache
 COPY go.mod go.sum ./
 
-# Download dependencies
+# Download dependencies before installing tools
 RUN go mod download
 
-# Install Air for live reloading (only in dev)
-RUN go install github.com/air-verse/air@latest
+# Install Air for live reloading and templ for template generation
+RUN go install github.com/air-verse/air@latest && \
+    go install github.com/a-h/templ/cmd/templ@v0.2.778
 
-# Copy the rest of the application code
-COPY . .
-
-# Install NPM dependencies
-RUN npm install
-
-# Build the application
-RUN make build
-
-# Expose the application port
 EXPOSE 1323
 
-# Set the entry point for development
 CMD ["air"]

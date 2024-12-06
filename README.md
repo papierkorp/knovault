@@ -1,200 +1,99 @@
-# knovault: Knowledgevault - Personal Wiki and To-dos
+# Knovault
 
-Personal wiki and to-do application built with Go, HTMX, and Templ.
+Knovault is a flexible, plugin-based knowledge management system written in Go. It features a customizable theme system, plugin architecture, and markdown support.
 
-## Design Choices
+## Features
 
-it should just have one topbar which includes the logo, a search bar, a settings icon, a select project button and a latest changes button
-
-as the main content (everything below the topbar) i want to display the markdown documents as cards where each file has this metadata:
-
-- Title: title
-- Description: first 100 words from the content
-- Type: doc/task/filter
-- Categorie: devops/cooking/develop...
-- Tags: kubernetes/pizza/...
-- content: md content..
-- Project: can be read from the path
-- path: /data/project1/tasks/task1.md
-
-while the front of the card should just include title, type and the first 3 tags + a button for more details
-
-## Core Features
-
-- Markdown file storage in `data` folder with Git version control
-- Plugin system for extensibility
-- Theme system for customizable UI
-- HTMX integration for dynamic content
-
-## Color palette
-
-- primary: #81a15a
-- accent: #9ece5a
-- neutral: #6b6e72
-- black: #4e5154
-- white: #d1d1d3
-
-# Installation process
-
-```bash
-# go projekt vorbereiten
-mkdir knovault && cd knovault
-go mod init knovault
-go mod tidy
-
-go install github.com/air-verse/air@latest
-air init
-vi .air.toml
-
-# web framework installieren (echo vs gin..)
-go get github.com/labstack/echo/v4@v4.12.0
-go get github.com/labstack/echo/v4/middleware@v4.12.0
-vi server.go
-go mod tidy
-go run server.go
-
-# frontend vorbereiten
-go install github.com/a-h/templ/cmd/templ@latest
-go get github.com/a-h/templ@v0.2.747
-templ generate
-
-vi static/css/main.css
-
-cd static && wget https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js # --minify
-
-```
-
-# Setup
+- 🔌 Plugin System - Extensible architecture for adding new functionality
+- 🎨 Theme Support - Customizable appearance with swappable themes
+- 📝 Markdown Support - Native markdown parsing and rendering
+- 🔄 Hot Reload - Development environment with automatic reloading
+- 🚀 HTMX Integration - Modern, minimal JavaScript approach
+- 📱 Responsive Design - Mobile-friendly interface
 
 ## Prerequisites
 
-1. Go 1.16+
-2. `go install github.com/a-h/templ/cmd/templ@latest`
-3. `go install github.com/cosmtrek/air@latest`
+- Docker (for development)
+- Go 1.22 or higher (for local development)
+- Make
 
-## Development
+## Quick Start
 
-```bash
-make dev  # Starts development server with live reload
-```
+1. **Clone the repository**
+
+   ```bash
+   git clone [repository-url]
+   cd knovault
+   ```
+
+2. **Development with Docker (Recommended)**
+
+   ```bash
+   make docker-dev-build
+   make docker-dev-run
+   ```
+
+3. **Local Development**
+   ```bash
+   make dev
+   ```
+
+The application will be available at `http://localhost:1323`
 
 ## Project Structure
 
 ```
 .
+├── cmd/                    # Application entry point
 ├── internal/
-│   ├── plugins/
-│   │   ├── core/       # Core plugins with source code
-│   │   │   └── PluginName/
-│   │   │       ├── main.go
-│   │   │       ├── PluginName.so
-│   │   │       └── templates/
-│   │   └── common/    # Runtime-loadable plugins (.so only)
-│   └── themes/
-│       ├── core/      # Core themes with source code
-│       │   └── ThemeName/
-│       │       ├── main.go
-│       │       ├── ThemeName.so
-│       │       └── templates/
-│       └── common/    # Runtime-loadable themes (.so only)
+│   ├── assetManager/      # Plugin and theme management
+│   ├── globals/           # Global variables and state
+│   ├── server/            # HTTP server and routing
+│   └── types/             # Type definitions and interfaces
+├── data/                  # Content storage
+├── static/                # Static assets
+└── docker/                # Docker configuration
 ```
 
-## Running the Application
+## Development
 
-The project includes a Makefile to simplify common development tasks. Here are the main commands you'll use:
+See [Developer Quick Start Guide](docs/dev-quickstart.md) for detailed development instructions.
 
-1. Generate Templ files and build Tailwind CSS: `make build`
+For creating new plugins or themes, refer to:
 
-2. Run the application in development mode (with live reloading): `make dev`
+- [Asset Manager Documentation](internal/assetManager/README.md)
 
-3. Build Tailwind CSS only: `make tailwind-build`
+## Docker Development Environment
 
-4. Watch for Tailwind CSS changes: `make tailwind-watch`
+The project includes a development-focused Docker environment that provides:
 
-5. Generate Templ files only: `make templ-generate`
+- Live code reloading
+- Template generation
+- Dependency management
+- Development tools
 
-To start developing, run:
+See [Development Environment Documentation](docs/docker-dev.md) for details.
 
-```bash
-make dev
-```
+## Built-in Plugins
 
-This command will generate Templ files, build Tailwind CSS, and start the application with live reloading.
+- **CustomCSS**: Custom styling support
+- **FileManager**: File system operations
+- **MarkdownParser**: Markdown processing
+- **ThemeChanger**: Theme switching functionality
 
-Open your browser and navigate to [http://localhost:132](http://localhost:1323) to see the application.
+## Built-in Themes
 
-## Creating Plugins
-
-1. Create plugin directory structure:
-
-```bash
-mkdir -p internal/plugins/core/MyPlugin/templates
-```
-
-2. Implement the plugin interface in `main.go`:
-
-```go
-package main
-
-type MyPlugin struct{}
-
-func (p *MyPlugin) Name() string {
-    return "MyPlugin"
-}
-
-// Implement other required methods...
-
-var Plugin = MyPlugin{}
-```
-
-3. Add templates in the templates directory if needed
-4. Plugin will be compiled automatically on server start
-
-## Creating Themes
-
-1. Create theme directory structure:
-
-```bash
-mkdir -p internal/themes/core/MyTheme/templates/layout
-```
-
-2. Implement the theme interface in `main.go`:
-
-```go
-package main
-
-type MyTheme struct{}
-
-func (t *MyTheme) Home() (templ.Component, error) {
-    return templates.Home(), nil
-}
-
-// Implement other required methods...
-
-var Theme = MyTheme{}
-```
-
-3. Add templates and layout files
-4. Theme will be compiled automatically on server start
-
-## Runtime Plugin/Theme Installation
-
-- Copy compiled .so files to respective common directories
-- System will detect and load automatically
-- No server restart required
-
-## Available Make Commands
-
-- `make dev`: Development mode with live reload
-- `make build`: Production build
-- `make docker-build-dev`: Build development Docker image
-- `make docker-build-prod`: Build production Docker image
--
+- **defaultTheme**: Default application appearance
+- **dark**: Dark mode theme
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to your branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+[License Type] - See LICENSE file for details
