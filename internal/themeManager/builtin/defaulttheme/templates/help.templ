@@ -1,0 +1,25 @@
+// internal/themeManager/builtin/defaulttheme/templates/help.templ
+package templates
+
+import (
+    "knovault/internal/themeManager/builtin/defaulttheme/templates/layout"
+)
+
+templ Help() {
+    @layout.Base("Help") {
+        <h1>Help</h1>
+        <div class="help-content">
+            <section>
+                <h2>Getting Started</h2>
+                <p>Welcome to Knovault! Here's how to get started:</p>
+                <ul>
+                    <li>Browse documentation in the Docs section</li>
+                    <li>Use the Search feature to find specific content</li>
+                    <li>Customize your experience in Settings</li>
+                    <li>Try out features in the Playground</li>
+                </ul>
+            </section>
+        </div>
+    }
+}
+

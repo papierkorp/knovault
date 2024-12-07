@@ -1,15 +1,27 @@
+// internal/globals/globals.go
 package globals
 
 import (
     "knovault/internal/types"
 )
 
-var manager types.AssetManager
+var (
+    pluginManager types.PluginManager
+    themeManager types.ThemeManager
+)
 
-func SetAssetManager(m types.AssetManager) {
-    manager = m
+func SetPluginManager(pm types.PluginManager) {
+    pluginManager = pm
 }
 
-func GetAssetManager() types.AssetManager {
-    return manager
+func GetPluginManager() types.PluginManager {
+    return pluginManager
+}
+
+func SetThemeManager(tm types.ThemeManager) {
+    themeManager = tm
+}
+
+func GetThemeManager() types.ThemeManager {
+    return themeManager
 }

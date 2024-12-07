@@ -1,3 +1,4 @@
+// internal/types/types.go
 package types
 
 import (
@@ -15,6 +16,13 @@ type Theme interface {
     Docs(content string) (templ.Component, error)
     Playground() (templ.Component, error)
     Plugins() (templ.Component, error)
+}
+
+// ThemeInfo structure for theme metadata
+type ThemeInfo struct {
+    Name        string   `json:"name"`
+    Description string   `json:"description"`
+    Tags        []string `json:"tags"`
 }
 
 // Plugin interface defines required methods for plugins
@@ -53,15 +61,43 @@ type PluginRoute struct {
     Handler echo.HandlerFunc
 }
 
-// AssetManager interface defines methods for managing assets
-type AssetManager interface {
+// Manager interfaces
+type PluginManager interface {
     GetPlugin(name string) (Plugin, bool)
     ListPlugins() []PluginInfo
+    Initialize() error
+}
+
+type ThemeManager interface {
     GetCurrentTheme() Theme
     SetCurrentTheme(name string) error
     GetCurrentThemeName() string
     GetAvailableThemes() []string
+    Initialize() error
+}
+
+// Extension interfaces for additional functionality
+type PluginManagerWithExtensions interface {
+    PluginManager
     GetPluginTemplateExtensions(templateName string) []templ.Component
-    LoadAssets() error
-    ApplyPluginRoutes(e *echo.Echo)
+}
+
+type ThemeManagerWithRoutes interface {
+    ThemeManager
+    ApplyThemeRoutes(e *echo.Echo)
+}
+
+// Configuration types
+type ThemeMetadata struct {
+    Name    string   `json:"name"`
+    Path    string   `json:"path"`
+    Enabled bool     `json:"enabled"`
+    Tags    []string `json:"tags"`
+}
+
+type PluginMetadata struct {
+    Name    string   `json:"name"`
+    Path    string   `json:"path"`
+    Enabled bool     `json:"enabled"`
+    Tags    []string `json:"tags"`
 }

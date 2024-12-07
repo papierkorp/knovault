@@ -1,0 +1,30 @@
+// internal/pluginManager/external/CustomCSS/templates/custom_css_editor.templ
+package templates
+
+templ CustomCSSEditor(css string, message string) {
+    <div id="custom-css-editor">
+        if message != "" {
+            <p class="message">{ message }</p>
+        }
+        <h2>Custom CSS</h2>
+        <form hx-post="/plugins/CustomCSS"
+              hx-target="#custom-css-editor"
+              hx-swap="outerHTML"
+              hx-trigger="submit"
+              hx-boost="false">
+            <textarea name="css"
+                      id="customcsstextarea"
+                      rows="20"
+                      style="width: 100%; font-family: monospace;">{ css }</textarea>
+            <div class="button-group">
+                <button type="submit">Save and Reload</button>
+                <button type="button"
+                        hx-post="/plugins/CustomCSS"
+                        hx-vals='{"action": "reset"}'
+                        hx-target="#custom-css-editor"
+                        hx-swap="outerHTML"
+                        hx-boost="false">Reset and Reload</button>
+            </div>
+        </form>
+    </div>
+}

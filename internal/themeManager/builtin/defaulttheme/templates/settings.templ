@@ -1,0 +1,20 @@
+package templates
+
+import (
+    "knovault/internal/themeManager/builtin/defaulttheme/templates/layout"
+    "knovault/internal/globals"
+    "knovault/internal/types"  // Added this import
+)
+
+templ Settings() {
+    @layout.Base("Settings") {
+        <div class="settings-container">
+            <h1>Settings</h1>
+            if pm, ok := globals.GetPluginManager().(types.PluginManagerWithExtensions); ok {
+                for _, extension := range pm.GetPluginTemplateExtensions("settings") {
+                    @extension
+                }
+            }
+        </div>
+    }
+}

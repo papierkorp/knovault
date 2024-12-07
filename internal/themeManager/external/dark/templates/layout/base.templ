@@ -1,0 +1,95 @@
+// internal/themeManager/external/dark/templates/layout/base.templ
+package layout
+
+templ Base(title string) {
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>{ title }</title>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <link href="/static/css/style.css" rel="stylesheet"/>
+            <link href="/static/css/custom.css" rel="stylesheet"/>
+            <style>
+                /* Dark theme styles */
+                :root {
+                    --bg-color: #1a1a1a;
+                    --text-color: #e0e0e0;
+                    --link-color: #66b3ff;
+                    --border-color: #333;
+                    --header-bg: #2d2d2d;
+                }
+
+                body {
+                    background-color: var(--bg-color);
+                    color: var(--text-color);
+                }
+
+                a {
+                    color: var(--link-color);
+                }
+
+                header {
+                    background-color: var(--header-bg);
+                    padding: 1rem;
+                    border-bottom: 1px solid var(--border-color);
+                }
+
+                input, textarea, select {
+                    background-color: #2d2d2d;
+                    color: var(--text-color);
+                    border: 1px solid var(--border-color);
+                }
+
+                button {
+                    background-color: #404040;
+                    color: var(--text-color);
+                    border: 1px solid var(--border-color);
+                    padding: 0.5rem 1rem;
+                    cursor: pointer;
+                }
+
+                button:hover {
+                    background-color: #4d4d4d;
+                }
+
+                .plugin-card {
+                    background-color: #2d2d2d;
+                    border: 1px solid var(--border-color);
+                    padding: 1rem;
+                    margin: 1rem 0;
+                }
+
+                .tag {
+                    background-color: #404040;
+                    color: var(--text-color);
+                    padding: 0.2rem 0.5rem;
+                    border-radius: 3px;
+                    margin-right: 0.5rem;
+                }
+            </style>
+        </head>
+        <body>
+            <div id="wrapper">
+                @header()
+                @htmx()
+                <hr />
+                <main>
+                    { children... }
+                </main>
+            </div>
+        </body>
+    </html>
+}
+
+templ header() {
+    <header>
+        <a href="/">HOME</a>
+        | Dark Theme |
+    </header>
+}
+
+templ htmx() {
+    <script src="/static/htmx.min.js"></script>
+}
+

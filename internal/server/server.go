@@ -1,10 +1,10 @@
 // internal/server/server.go
-
 package server
 
 import (
     "log"
-    "knovault/internal/assetManager"
+    "knovault/internal/pluginManager"
+    "knovault/internal/themeManager"
     "knovault/internal/globals"
 
     "github.com/labstack/echo/v4"
@@ -14,14 +14,22 @@ import (
 func Start() {
     e := echo.New()
 
-    manager := assetManager.NewAssetManager()
-    globals.SetAssetManager(manager)
-
-    if err := manager.LoadAssets(); err != nil {
-        log.Fatalf("Failed to load assets: %v", err)
+    // Initialize plugin manager
+    pm := pluginManager.NewPluginManager()
+    globals.SetPluginManager(pm)
+    if err := pm.Initialize(); err != nil {
+        log.Fatalf("Failed to initialize plugin manager: %v", err)
     }
 
-    err := manager.SetCurrentTheme("defaultTheme")
+    // Initialize theme manager
+    tm := themeManager.NewThemeManager()
+    globals.SetThemeManager(tm)
+    if err := tm.Initialize(); err != nil {
+        log.Fatalf("Failed to initialize theme manager: %v", err)
+    }
+
+    // Set default theme
+    err := tm.SetCurrentTheme("defaultTheme")
     if err != nil {
         log.Fatalf("Failed to set default theme: %v", err)
     }
@@ -34,3 +42,4 @@ func Start() {
 
     e.Logger.Fatal(e.Start(":1323"))
 }
+

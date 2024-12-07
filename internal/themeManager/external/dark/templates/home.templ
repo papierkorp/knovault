@@ -1,0 +1,25 @@
+// internal/themeManager/external/dark/templates/home.templ
+package templates
+
+import (
+    "knovault/internal/themeManager/external/dark/templates/layout"
+)
+
+templ Home() {
+    @layout.Base("Home") {
+        <div class="home-container">
+            <h1>Welcome to Dark Knovault</h1>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/help">Help</a></li>
+                    <li><a href="/playground">Playground</a></li>
+                    <li><a href="/search">Search</a></li>
+                    <li><a href="/settings">Settings</a></li>
+                    <li><a href="/docs">Documentation</a></li>
+                </ul>
+            </nav>
+        </div>
+    }
+}
+

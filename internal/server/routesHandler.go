@@ -1,3 +1,4 @@
+// internal/server/routesHandler.go
 package server
 
 import (
@@ -6,7 +7,7 @@ import (
 )
 
 func handleHome(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().Home()
+    component, err := globals.GetThemeManager().GetCurrentTheme().Home()
     if err != nil {
         return err
     }
@@ -14,7 +15,7 @@ func handleHome(c echo.Context) error {
 }
 
 func handlePlayground(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().Playground()
+    component, err := globals.GetThemeManager().GetCurrentTheme().Playground()
     if err != nil {
         return err
     }
@@ -22,7 +23,7 @@ func handlePlayground(c echo.Context) error {
 }
 
 func handleHelp(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().Help()
+    component, err := globals.GetThemeManager().GetCurrentTheme().Help()
     if err != nil {
         return err
     }
@@ -30,7 +31,7 @@ func handleHelp(c echo.Context) error {
 }
 
 func handleSettings(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().Settings()
+    component, err := globals.GetThemeManager().GetCurrentTheme().Settings()
     if err != nil {
         return err
     }
@@ -38,7 +39,7 @@ func handleSettings(c echo.Context) error {
 }
 
 func handleSearch(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().Search()
+    component, err := globals.GetThemeManager().GetCurrentTheme().Search()
     if err != nil {
         return err
     }
@@ -46,7 +47,7 @@ func handleSearch(c echo.Context) error {
 }
 
 func handleDocsRoot(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().DocsRoot()
+    component, err := globals.GetThemeManager().GetCurrentTheme().DocsRoot()
     if err != nil {
         return err
     }
@@ -55,7 +56,7 @@ func handleDocsRoot(c echo.Context) error {
 
 func handleDocs(c echo.Context) error {
     title := c.Param("title")
-    component, err := globals.GetAssetManager().GetCurrentTheme().Docs(title)
+    component, err := globals.GetThemeManager().GetCurrentTheme().Docs(title)
     if err != nil {
         return err
     }
@@ -63,7 +64,7 @@ func handleDocs(c echo.Context) error {
 }
 
 func handlePlugins(c echo.Context) error {
-    component, err := globals.GetAssetManager().GetCurrentTheme().Plugins()
+    component, err := globals.GetThemeManager().GetCurrentTheme().Plugins()
     if err != nil {
         return err
     }
