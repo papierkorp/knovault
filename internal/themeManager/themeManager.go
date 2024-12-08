@@ -26,12 +26,13 @@ func (tm *ThemeManager) Initialize() error {
     tm.mutex.Lock()
     defer tm.mutex.Unlock()
 
-    // Load builtin themes
+    log.Println("Loading builtin themes...")
     builtinThemes, err := loadBuiltinThemes()
     if err != nil {
-        log.Printf("Warning: Error loading builtin themes: %v", err)
+        log.Printf("⚠️  Warning: Error loading builtin themes: %v", err)
     }
     for name, theme := range builtinThemes {
+        log.Printf("✓ Loaded builtin theme: %s", name)
         tm.themes[name] = theme
         tm.themeInfo[name] = types.ThemeInfo{
             Name: name,
@@ -39,12 +40,13 @@ func (tm *ThemeManager) Initialize() error {
         }
     }
 
-    // Load external themes
+    log.Println("Loading external themes...")
     externalThemes, err := loadExternalThemes()
     if err != nil {
-        log.Printf("Warning: Error loading external themes: %v", err)
+        log.Printf("⚠️  Warning: Error loading external themes: %v", err)
     }
     for name, theme := range externalThemes {
+        log.Printf("✓ Loaded external theme: %s", name)
         tm.themes[name] = theme
         tm.themeInfo[name] = types.ThemeInfo{
             Name: name,
@@ -53,20 +55,23 @@ func (tm *ThemeManager) Initialize() error {
     }
 
     if len(tm.themes) == 0 {
-        return fmt.Errorf("no themes were loaded")
+        return fmt.Errorf("❌ No themes were loaded")
     }
 
     // Set default theme
     if theme, ok := tm.themes["defaultTheme"]; ok {
         tm.currentTheme = theme
+        log.Println("✓ Set default theme: defaultTheme")
     } else {
         // Set first available theme as default
-        for _, theme := range tm.themes {
+        for name, theme := range tm.themes {
             tm.currentTheme = theme
+            log.Printf("⚠️  Default theme not found, using: %s", name)
             break
         }
     }
 
+    log.Printf("✓ Theme Manager initialized with %d themes", len(tm.themes))
     return nil
 }
 

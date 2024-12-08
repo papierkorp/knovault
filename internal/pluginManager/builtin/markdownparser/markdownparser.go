@@ -11,12 +11,22 @@ import (
     "github.com/gomarkdown/markdown"
     "github.com/gomarkdown/markdown/parser"
     "github.com/microcosm-cc/bluemonday"
+    "knovault/internal/globals"
+    "knovault/internal/types"
 )
 
 type MarkdownParserPlugin struct{}
 
+func init() {
+    globals.RegisterPlugin("MarkdownParser", NewMarkdownParserPlugin)
+}
+
+func NewMarkdownParserPlugin() types.Plugin {
+    return &MarkdownParserPlugin{}
+}
+
 func (p *MarkdownParserPlugin) Name() string {
-    return "Parser"
+    return "MarkdownParser"
 }
 
 func (p *MarkdownParserPlugin) Description() string {

@@ -9,7 +9,7 @@ import (
 
 templ Plugins() {
     @layout.Base("Plugins") {
-        <div class="plugins-container">
+        <div id="pluginsContainer" class="basicRoute">
             <h1>Available Plugins</h1>
             <div class="plugins-list">
                 for _, info := range globals.GetPluginManager().ListPlugins() {

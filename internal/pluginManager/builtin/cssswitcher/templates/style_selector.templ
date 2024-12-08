@@ -1,0 +1,23 @@
+package templates
+
+templ StyleSelector(styles []string, currentStyle string) {
+    <div class="style-selector">
+        <h2>Visual Theme</h2>
+        <div class="select-wrapper">
+            <select
+                name="style"
+                hx-post="/plugins/CSSSwitcher"
+                hx-trigger="change"
+                hx-target=".style-selector"
+                hx-swap="outerHTML">
+                for _, style := range styles {
+                    if style == currentStyle {
+                        <option value={style} selected>{ style }</option>
+                    } else {
+                        <option value={style}>{ style }</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+}

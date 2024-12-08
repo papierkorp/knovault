@@ -1,4 +1,3 @@
-// internal/pluginManager/builtin/filemanager/filemanager.go
 package filemanager
 
 import (
@@ -10,9 +9,17 @@ import (
     "strings"
 
     "github.com/a-h/templ"
+    "knovault/internal/globals"
+    "knovault/internal/types"
 )
 
 type FileManagerPlugin struct{}
+
+func init() {
+    globals.RegisterPlugin("filemanager", func() types.Plugin {
+        return &FileManagerPlugin{}
+    })
+}
 
 func (p *FileManagerPlugin) Name() string {
     return "FileManager"

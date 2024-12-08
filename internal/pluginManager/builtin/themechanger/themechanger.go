@@ -16,6 +16,15 @@ import (
 
 type ThemeChangerPlugin struct{}
 
+func init() {
+    globals.RegisterPlugin("ThemeChanger", NewThemeChangerPlugin)
+}
+
+func NewThemeChangerPlugin() types.Plugin {
+    return &ThemeChangerPlugin{}
+}
+
+
 func (p *ThemeChangerPlugin) Name() string {
     return "ThemeChanger"
 }

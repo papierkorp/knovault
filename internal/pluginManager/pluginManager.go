@@ -25,12 +25,13 @@ func (pm *PluginManager) Initialize() error {
     pm.mutex.Lock()
     defer pm.mutex.Unlock()
 
-    // Load builtin plugins
+    log.Println("Loading builtin plugins...")
     builtinPlugins, err := loadBuiltinPlugins()
     if err != nil {
-        log.Printf("Warning: Error loading builtin plugins: %v", err)
+        log.Printf("⚠️  Warning: Error loading builtin plugins: %v", err)
     }
     for name, plugin := range builtinPlugins {
+        log.Printf("✓ Loaded builtin plugin: %s - %s", name, plugin.Description())
         pm.plugins[name] = plugin
         pm.pluginInfo[name] = types.PluginInfo{
             Name:        name,
@@ -39,12 +40,13 @@ func (pm *PluginManager) Initialize() error {
         }
     }
 
-    // Load external plugins
+    log.Println("Loading external plugins...")
     externalPlugins, err := loadExternalPlugins()
     if err != nil {
-        log.Printf("Warning: Error loading external plugins: %v", err)
+        log.Printf("⚠️  Warning: Error loading external plugins: %v", err)
     }
     for name, plugin := range externalPlugins {
+        log.Printf("✓ Loaded external plugin: %s - %s", name, plugin.Description())
         pm.plugins[name] = plugin
         pm.pluginInfo[name] = types.PluginInfo{
             Name:        name,
@@ -54,9 +56,10 @@ func (pm *PluginManager) Initialize() error {
     }
 
     if len(pm.plugins) == 0 {
-        return fmt.Errorf("no plugins were loaded")
+        return fmt.Errorf("❌ No plugins were loaded")
     }
 
+    log.Printf("✓ Plugin Manager initialized with %d plugins", len(pm.plugins))
     return nil
 }
 
